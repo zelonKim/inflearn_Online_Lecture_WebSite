@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
-import ReactQueryProvider from "./config/ReactQueryProvider";
+import ReactQueryProvider from "@/config/ReactQueryProvider";
+import RecoilProvider from "@/config/RecoilProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,14 +17,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-
-      <html lang="en">
-        <body className={inter.className}>
-          <p>From Layout</p>
-          {/* 모든 페이지에서 'From Layout'글자가 보여짐. */}
-          {children}
-        </body>
-      </html>
-
+    <ReactQueryProvider>
+      <RecoilProvider>
+        <html lang="en">
+          <body className={inter.className}>{children}</body>
+        </html>
+      </RecoilProvider>
+    </ReactQueryProvider>
   );
 }
