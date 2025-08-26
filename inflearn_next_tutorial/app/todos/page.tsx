@@ -9,23 +9,19 @@ export default function TodosPage() {
   const [todoInput, setTodoInput] = useState("");
 
   const todosQuery = useQuery({
-    // GET을 수행함.
-    queryKey: ["todos"], // 캐싱할 쿼리 키
-    queryFn: getTodos, // 쿼리 함수
+    queryKey: ["todos"],
+    queryFn: getTodos,
   });
 
   const createTodoMutation = useMutation({
-    // CREATE, UPDATE, DELETE를 수행함.
     mutationFn: async () => {
-      // 뮤테이션 함수
       if (todoInput === "") throw new Error("투두를 입력해주세요");
       return createTodo(todoInput);
     },
     onSuccess: (TODOS) => {
-      // 매개변수에는 뮤테이션 함수의 리턴값이 담김. 
       console.log("뮤테이션 성공:", TODOS);
-      // todosQuery.refetch(); // 데이터를 다시 가져옴.
-      queryClient.invalidateQueries(["todos"]); // 쿼리 키에 해당되는 쿼리를 무효화 시키고, 데이터를 다시 가져옴.
+
+      queryClient.invalidateQueries(["todos"]);
     },
     onError: (err: any) => {
       alert(err.message);
