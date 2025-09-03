@@ -9,7 +9,7 @@ export default async function ApiTestPage() {
       <h1> 백엔드 API 테스트 </h1>
 
       <h2> 서버 컴포넌트 API 테스트 결과 </h2>
-      <pre>{apiResult}</pre>
+      <pre>{apiResult.data}</pre>
     </div>
   );
 }

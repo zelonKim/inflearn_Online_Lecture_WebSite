@@ -18,7 +18,7 @@ export default function ClientTest() {
   return (
     <div className="p-8">
       <h2>클라이언트 컴포넌트 API 테스트 결과</h2>
-      <pre>{data}</pre>
+      <pre>{data?.data}</pre>
     </div>
   );
 }

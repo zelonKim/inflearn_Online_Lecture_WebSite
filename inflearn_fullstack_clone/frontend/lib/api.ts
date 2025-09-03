@@ -3,13 +3,16 @@
 import { cookies } from "next/headers";
 import { getCookie } from "cookies-next/server";
 import { RequestInit } from "next/dist/server/web/spec-extension/request";
+import { appControllerTestUser } from "@/generated/openapi-client";
 
+/*
 const AUTH_COOKIE_NAME =
   process.env.NODE_ENV === "production"
     ? "__Secure-authjs.session-token"
     : "authjs.session-token";
 
 const API_URL = process.env.API_URL || "http://localhost:8000";
+
 
 async function fetchAPI<T>(
   endpoint: string,
@@ -60,4 +63,13 @@ export async function getUserTest(token?: string) {
   }
 
   return fetchAPI<string>("/user-test", {}, token);
+}
+*/
+
+export async function getUserTest(token?: string) {
+  const { data, error } = appControllerTestUser();
+  return {
+    data,
+    error,
+  };
 }
