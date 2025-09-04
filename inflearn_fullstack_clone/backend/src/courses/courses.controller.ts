@@ -41,6 +41,8 @@ export class CoursesController {
     return this.coursesService.create(req.user.sub, createCourseDto);
   }
 
+
+  
   @Get()
   @ApiQuery({ name: 'title', required: false })
   @ApiQuery({ name: 'level', required: false })
@@ -87,6 +89,8 @@ export class CoursesController {
     });
   }
 
+
+
   @Get(':id')
   @ApiQuery({
     name: 'include',
@@ -106,6 +110,8 @@ export class CoursesController {
     return this.coursesService.findOne(id, includeArray);
   }
 
+
+
   @Patch(':id')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('access-token')
@@ -120,6 +126,7 @@ export class CoursesController {
   ) {
     return this.coursesService.update(id, req.user.sub, updateCourseDto);
   }
+
 
   @Delete(':id')
   @UseGuards(AccessTokenGuard)

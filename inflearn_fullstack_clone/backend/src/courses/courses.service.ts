@@ -27,6 +27,9 @@ export class CoursesService {
     });
   }
 
+
+
+  
   async findAll(params: {
     skip?: number;
     take?: number;
@@ -45,6 +48,10 @@ export class CoursesService {
     });
   }
 
+
+
+
+
   async findOne(id: string, include?: string[]): Promise<Course | null> {
     const includeObject = {};
 
@@ -61,6 +68,10 @@ export class CoursesService {
 
     return course;
   }
+
+
+
+
 
   async update(
     id: string,
@@ -95,6 +106,10 @@ export class CoursesService {
       data,
     });
   }
+
+
+
+
 
   async delete(id: string, userId: string) {
     const course = await this.prisma.course.findUnique({
