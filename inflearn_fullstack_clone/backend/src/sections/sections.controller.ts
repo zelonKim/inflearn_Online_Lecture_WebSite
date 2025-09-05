@@ -17,12 +17,14 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiTags,
 } from '@nestjs/swagger';
 import { CreateSectionDto } from './dto/create-section.dto';
 import { UpdateSectionDto } from './dto/update-section.dto';
 import { Section as SectionEntity } from 'src/_gen/prisma-class/section';
 import { Request } from 'express';
 
+@ApiTags('섹션')
 @Controller('sections')
 export class SectionsController {
   constructor(private readonly sectionsService: SectionsService) {}
@@ -49,8 +51,6 @@ export class SectionsController {
     );
   }
 
-
-
   @Get(':sectionId')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('access-token')
@@ -63,8 +63,6 @@ export class SectionsController {
   findOne(@Param('sectionId') sectionId: string, @Req() req: Request) {
     return this.sectionsService.findOne(sectionId, req.user.sub);
   }
-
-
 
   @Patch(':sectionId')
   @UseGuards(AccessTokenGuard)
@@ -88,8 +86,6 @@ export class SectionsController {
     );
   }
 
-
-  
   @Delete(':sectionId')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('access-token')

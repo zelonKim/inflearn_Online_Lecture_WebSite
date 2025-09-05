@@ -25,7 +25,7 @@ import { Prisma } from '@prisma/client';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { Course as CourseEntity } from 'src/_gen/prisma-class/course';
 
-@ApiTags('courses')
+@ApiTags('코스')
 @Controller('courses')
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
@@ -41,8 +41,6 @@ export class CoursesController {
     return this.coursesService.create(req.user.sub, createCourseDto);
   }
 
-
-  
   @Get()
   @ApiQuery({ name: 'title', required: false })
   @ApiQuery({ name: 'level', required: false })
@@ -89,8 +87,6 @@ export class CoursesController {
     });
   }
 
-
-
   @Get(':id')
   @ApiQuery({
     name: 'include',
@@ -110,8 +106,6 @@ export class CoursesController {
     return this.coursesService.findOne(id, includeArray);
   }
 
-
-
   @Patch(':id')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('access-token')
@@ -126,7 +120,6 @@ export class CoursesController {
   ) {
     return this.coursesService.update(id, req.user.sub, updateCourseDto);
   }
-
 
   @Delete(':id')
   @UseGuards(AccessTokenGuard)
