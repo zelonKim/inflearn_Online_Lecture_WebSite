@@ -8,7 +8,7 @@ import { CourseCategory as CourseCategoryEntity } from 'src/_gen/prisma-class/co
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
-  @Get()
+  @Get('')
   @ApiOperation({ summary: '카테고리 리스트' })
   @ApiOkResponse({
     description: '카테고리를 성공적으로 가져옴.',

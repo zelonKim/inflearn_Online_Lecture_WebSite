@@ -8,7 +8,7 @@ export default function ClientTest() {
 
   const { data, error, isLoading } = useQuery({
     queryKey: ["user-test"],
-    queryFn: api.getUserTest,
+    queryFn: () => api.getUserTest(),
   });
 
   if (isLoading) {
@@ -18,7 +18,7 @@ export default function ClientTest() {
   return (
     <div className="p-8">
       <h2>클라이언트 컴포넌트 API 테스트 결과</h2>
-      <pre>{data?.data}</pre>
+      <pre>{data.data}</pre>
     </div>
   );
 }

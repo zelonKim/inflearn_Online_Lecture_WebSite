@@ -1,5 +1,5 @@
 import { CreateClientConfig } from "@/generated/openapi-client/client.gen";
-import { getCookie } from "cookies-next/client";
+import { getCookie } from "cookies-next/server";
 import { cookies } from "next/headers";
 
 const AUTH_COOKIE_NAME =
