@@ -1,5 +1,5 @@
-import InstructorPageName from "./_components/instructor-page-name";
-import InstructorSideBar from "./_components/instructor-sidebar";
+import InstructorPageName from "./components/instructor-page-name";
+import InstructorSideBar from "./components/instructor-sidebar";
 
 export default function InstructorLayout({
   children,
