@@ -1,16 +1,18 @@
 import { notFound } from "next/navigation";
-import EditCourseInfoUI from "./ui";
+import UI from "./ui";
 import * as api from "@/lib/api";
 
-export default async function EditCourseInfoPage({
+export default async function EditCurriculumPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
   const course = await api.getCourseById(id);
+
   if (!course.data || course.error) {
     notFound();
   }
-  return <EditCourseInfoUI course={course.data} />;
+
+  return <UI initialCourse={course.data} />;
 }

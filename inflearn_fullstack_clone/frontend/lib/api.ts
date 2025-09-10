@@ -5,6 +5,13 @@ import {
   coursesControllerCreate,
   coursesControllerFindAll,
   coursesControllerFindOne,
+  coursesControllerUpdate,
+
+  lecturesControllerCreate,
+  lecturesControllerDelete,
+  sectionsControllerCreate,
+  sectionsControllerDelete,
+  UpdateCourseDto,
 } from "@/generated/openapi-client";
 
 export const getAllCategories = async () => {
@@ -36,11 +43,13 @@ export const createCourse = async (title: string) => {
   };
 };
 
-
-export const getCourseById = async (id: string) => {
+export const getCourseById = async (id: string, include?: string) => {
   const { data, error } = await coursesControllerFindOne({
     path: {
       id,
+    },
+    query: {
+      include: include ?? "sections, lectures",
     },
   });
 
@@ -48,4 +57,60 @@ export const getCourseById = async (id: string) => {
     data,
     error,
   };
+};
+
+export const updateCourse = async (
+  id: string,
+  updateCourseDto: UpdateCourseDto
+) => {
+  const { data, error } = await coursesControllerUpdate({
+    path: {
+      id,
+    },
+    body: updateCourseDto,
+  });
+
+  return { data, error };
+};
+
+export const createSection = async (courseId: string, title: string) => {
+  const { data, error } = await sectionsControllerCreate({
+    path: {
+      courseId,
+    },
+    body: {
+      title,
+    },
+  });
+  return { data, error };
+};
+
+export const deleteSection = async (sectionId: string) => {
+  const { data, error } = await sectionsControllerDelete({
+    path: {
+      sectionId,
+    },
+  });
+  return { data, error };
+};
+
+export const createLecture = async (sectionId: string, title: string) => {
+  const { data, error } = await lecturesControllerCreate({
+    path: {
+      sectionId,
+    },
+    body: {
+      title,
+    },
+  });
+  return { data, error };
+};
+
+export const deleteLecture = async (lectureId: string) => {
+  const { data, error } = await lecturesControllerDelete({
+    path: {
+      lectureId,
+    },
+  });
+  return { data, error };
 };

@@ -27,9 +27,6 @@ export class CoursesService {
     });
   }
 
-
-
-  
   async findAll(params: {
     skip?: number;
     take?: number;
@@ -48,11 +45,11 @@ export class CoursesService {
     });
   }
 
-
-
-
-
-  async findOne(id: string, include?: string[]): Promise<Course | null> {
+  async findOne(
+    id: string,
+    include?: Prisma.CourseInclude,
+  ): Promise<Course | null> {
+    
     const includeObject = {};
 
     if (include) {
@@ -68,10 +65,6 @@ export class CoursesService {
 
     return course;
   }
-
-
-
-
 
   async update(
     id: string,
@@ -106,10 +99,6 @@ export class CoursesService {
       data,
     });
   }
-
-
-
-
 
   async delete(id: string, userId: string) {
     const course = await this.prisma.course.findUnique({
