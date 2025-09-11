@@ -6,11 +6,12 @@ import {
   coursesControllerFindAll,
   coursesControllerFindOne,
   coursesControllerUpdate,
-
   lecturesControllerCreate,
   lecturesControllerDelete,
+  lecturesControllerUpdate,
   sectionsControllerCreate,
   sectionsControllerDelete,
+  sectionsControllerUpdate,
   UpdateCourseDto,
 } from "@/generated/openapi-client";
 
@@ -114,3 +115,27 @@ export const deleteLecture = async (lectureId: string) => {
   });
   return { data, error };
 };
+
+export const updateSectionTitle = async (sectionId: string, title: string) => {
+  const { data, error } = await sectionsControllerUpdate({
+    path: {
+      sectionId,
+    },
+    body: {
+      title,
+    },
+  });
+  return { data, error };
+};
+
+export const updateLecturePreview = async (lectureId: string, isPreview: boolean) => {
+  const {data, error} = await lecturesControllerUpdate({
+    path: {
+      lectureId,
+    },
+    body: {
+      isPreview
+    }
+  })
+  return {data, error}
+}

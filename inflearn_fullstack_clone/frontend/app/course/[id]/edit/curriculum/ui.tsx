@@ -121,7 +121,6 @@ export default function UI({ initialCourse }: { initialCourse: Course }) {
 
 
 
-  //////////////////////////////////
 
 
 
@@ -148,9 +147,10 @@ export default function UI({ initialCourse }: { initialCourse: Course }) {
     },
   });
 
+
+
   // UI 핸들러
   const handleAddSection = () => {
-    // '섹션 제목을 작성해주세요'로 바로 생성
     addSectionMutation.mutate("섹션 제목을 작성해주세요");
     setAddSectionTitle("");
   };
@@ -208,9 +208,6 @@ export default function UI({ initialCourse }: { initialCourse: Course }) {
 
   if (!course) return <div>코스 정보를 불러올 수 없습니다.</div>;
 
-
-
-//////////////////////////////////
 
 
   return (

@@ -115,7 +115,14 @@ export class CoursesController {
       const includeObject = {
         sections: {
           include: {
-            lectures: true,
+            lectures: {
+              orderBy: {
+                order: 'asc',
+              },
+            },
+          },
+          orderBy: {
+            order: 'asc',
           },
         },
         ...otherInclude.map((item) => ({
@@ -133,8 +140,6 @@ export class CoursesController {
     return this.coursesService.findOne(id, includeObject);
   }
 
-
-  
   @Patch(':id')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('access-token')
