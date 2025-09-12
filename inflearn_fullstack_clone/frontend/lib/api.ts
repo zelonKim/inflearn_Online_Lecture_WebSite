@@ -13,6 +13,7 @@ import {
   sectionsControllerDelete,
   sectionsControllerUpdate,
   UpdateCourseDto,
+  mediaControllerUploadMedia,
 } from "@/generated/openapi-client";
 
 export const getAllCategories = async () => {
@@ -128,14 +129,26 @@ export const updateSectionTitle = async (sectionId: string, title: string) => {
   return { data, error };
 };
 
-export const updateLecturePreview = async (lectureId: string, isPreview: boolean) => {
-  const {data, error} = await lecturesControllerUpdate({
+export const updateLecturePreview = async (
+  lectureId: string,
+  isPreview: boolean
+) => {
+  const { data, error } = await lecturesControllerUpdate({
     path: {
       lectureId,
     },
     body: {
-      isPreview
-    }
-  })
-  return {data, error}
-}
+      isPreview,
+    },
+  });
+  return { data, error };
+};
+
+export const uploadMedia = async (file: File) => {
+  const { data, error } = await mediaControllerUploadMedia({
+    body: {
+      file,
+    },
+  });
+  return { data, error };
+};

@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogTitle } from "@radix-ui/react-dialog";
 import { DialogFooter, DialogHeader } from "@/components/ui/dialog";
 import { useState } from "react";
 import { toast } from "sonner";
+import { EditLectureDialog } from "./_components/EditLectureDialog";
 
 export default function UI({ initialCourse }: { initialCourse: Course }) {
   const queryClient = useQueryClient();
@@ -28,6 +29,10 @@ export default function UI({ initialCourse }: { initialCourse: Course }) {
   const [sectionTitles, setSectionTitles] = useState<Record<string, string>>(
     {}
   );
+
+  // 강의 수정 Dialog 상태
+  const [editLecture, setEditLecture] = useState<Lecture | null>(null);
+  const [isEditLectureDialogOpen, setIsEditLectureDialogOpen] = useState(false);
 
   // 코스 데이터 조회
   const { data: course, isLoading } = useQuery<Course>({
@@ -119,11 +124,6 @@ export default function UI({ initialCourse }: { initialCourse: Course }) {
     },
   });
 
-
-
-
-
-
   // 섹션 제목 수정 mutation
   const updateSectionTitleMutation = useMutation({
     mutationFn: async ({
@@ -146,8 +146,6 @@ export default function UI({ initialCourse }: { initialCourse: Course }) {
       toast.success("섹션 제목이 수정되었습니다.");
     },
   });
-
-
 
   // UI 핸들러
   const handleAddSection = () => {
@@ -207,8 +205,6 @@ export default function UI({ initialCourse }: { initialCourse: Course }) {
   // 강의 미리보기 토글, 섹션 공개/비공개 토글 등은 TODO: mutation 추가 필요
 
   if (!course) return <div>코스 정보를 불러올 수 없습니다.</div>;
-
-
 
   return (
     <div className="space-y-8">
@@ -364,6 +360,17 @@ export default function UI({ initialCourse }: { initialCourse: Course }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {editLecture && (
+        <EditLectureDialog
+          isOpen={isEditLectureDialogOpen}
+          onClose={() => {
+            setIsEditLectureDialogOpen(false);
+            setEditLecture(null);
+          }}
+          lecture={editLecture}
+        />
+      )}
     </div>
   );
 }
