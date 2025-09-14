@@ -1,3 +1,4 @@
+/*
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -6,7 +7,6 @@ interface CKEditorProps {
   value: string;
   onChange: (value: string) => void;
 }
-
 
 const CKEditor = ({ value, onChange }: CKEditorProps) => {
   const editorRef = useRef<any>(null);
@@ -19,8 +19,6 @@ const CKEditor = ({ value, onChange }: CKEditorProps) => {
     setIsMounted(true);
     return () => setIsMounted(false);
   }, []);
-
-
 
   useEffect(() => {
     if (!isMounted) return;
@@ -38,7 +36,8 @@ const CKEditor = ({ value, onChange }: CKEditorProps) => {
         ).default; // 동적으로 CKEditor 모듈 로드
 
         if (containerRef.current && !editorRef.current) {
-          const editorInstance = await ClassicEditor.create( // 에디터 초기화
+          const editorInstance = await ClassicEditor.create(
+            // 에디터 초기화
             containerRef.current,
             {
               licenseKey: "GPL",
@@ -65,8 +64,8 @@ const CKEditor = ({ value, onChange }: CKEditorProps) => {
             }
           );
 
-
-          editorInstance.model.document.on("change:data", () => {  // 변경 이벤트 리스너 추가
+          editorInstance.model.document.on("change:data", () => {
+            // 변경 이벤트 리스너 추가
             const data = editorInstance.getData();
             if (data !== value) {
               onChange(data);
@@ -83,12 +82,12 @@ const CKEditor = ({ value, onChange }: CKEditorProps) => {
 
     loadEditor();
 
-   
-    return () => { // 컴포넌트 언마운트 시 에디터 정리
+    return () => {
+      // 컴포넌트 언마운트 시 에디터 정리
       const cleanup = async () => {
         if (editorRef.current) {
           try {
-            await editorRef.current.destroy(); 
+            await editorRef.current.destroy();
             editorRef.current = null;
             setIsEditorReady(false);
           } catch (error) {
@@ -100,8 +99,6 @@ const CKEditor = ({ value, onChange }: CKEditorProps) => {
     };
   }, [isMounted]);
 
-
-
   useEffect(() => {
     if (
       isEditorReady &&
@@ -112,13 +109,96 @@ const CKEditor = ({ value, onChange }: CKEditorProps) => {
     }
   }, [value, isEditorReady]);
 
-
-
   return (
-    <div className="ck-editor-container">
+    <div className="ck-editor-container prose">
       <div ref={containerRef} className="min-h-[300px] border p-4 rounded">
         {!isEditorReady && "에디터 로딩 중..."}
       </div>
+    </div>
+  );
+};
+
+export default CKEditor;
+*/
+
+// @ts-nocheck
+"use client";
+
+import React from "react";
+import { CKEditor as CKEditorReact } from "@ckeditor/ckeditor5-react";
+import {
+  ClassicEditor,
+  Essentials,
+  Paragraph,
+  Bold,
+  Italic,
+  Link,
+  Image,
+  ImageUpload,
+  Table,
+  TableToolbar,
+  BlockQuote,
+  List,
+  Heading,
+  Indent,
+  Base64UploadAdapter,
+} from "ckeditor5";
+import "ckeditor5/ckeditor5.css";
+
+interface CustomEditorProps {
+  value: string;
+  onChange: (value: string) => void;
+}
+
+const CKEditor = ({ value, onChange }: CustomEditorProps) => {
+  return (
+    <div className="ck-editor-container prose">
+      <CKEditorReact
+        editor={ClassicEditor}
+        data={value}
+        config={{
+          licenseKey: "GPL",
+          plugins: [
+            Essentials,
+            Paragraph,
+            Bold,
+            Italic,
+            Link,
+            Image,
+            ImageUpload,
+            Table,
+            TableToolbar,
+            BlockQuote,
+            List,
+            Heading,
+            Indent,
+            Base64UploadAdapter,
+          ],
+          toolbar: [
+            "heading",
+            "|",
+            "bold",
+            "italic",
+            "link",
+            "bulletedList",
+            "numberedList",
+            "|",
+            "outdent",
+            "indent",
+            "|",
+            "imageUpload",
+            "blockQuote",
+            "insertTable",
+            "undo",
+            "redo",
+          ],
+          language: "ko",
+        }}
+        onChange={(_, editor) => {
+          const data = editor.getData();
+          onChange(data);
+        }}
+      />
     </div>
   );
 };

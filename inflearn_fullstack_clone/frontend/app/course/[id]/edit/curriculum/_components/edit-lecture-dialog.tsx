@@ -16,11 +16,12 @@ import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
-import CKEditor from "@/components/ckeditor";
+
 import { FileVideo } from "lucide-react";
 import * as api from "@/lib/api";
 import { toast } from "sonner";
 import { Lecture } from "@/generated/openapi-client";
+import dynamic from "next/dynamic";
 
 interface EditLectureDialogProps {
   isOpen: boolean;
@@ -34,7 +35,6 @@ interface EditLectureForm {
   videoStorageInfo?: any;
 }
 
-
 const MAX_FILE_SIZE = 300 * 1024 * 1024; // 300 MB
 
 const ACCEPTED_VIDEO_TYPES = {
@@ -44,7 +44,9 @@ const ACCEPTED_VIDEO_TYPES = {
   "video/quicktime": [".mov"],
 };
 
-
+const CKEditor = dynamic(() => import("@/components/ckeditor"), {
+  ssr: false,
+});
 
 export function EditLectureDialog({
   isOpen,
@@ -59,8 +61,6 @@ export function EditLectureDialog({
     videoStorageInfo: lecture.videoStorageInfo,
   });
 
-
-
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (file) {
@@ -73,15 +73,12 @@ export function EditLectureDialog({
     }
   }, []);
 
-
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: ACCEPTED_VIDEO_TYPES,
     maxFiles: 1,
     maxSize: MAX_FILE_SIZE,
   });
-
-
 
   //////////////////
 
@@ -103,17 +100,12 @@ export function EditLectureDialog({
     },
   });
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     editLectureMutation.mutate(form);
   };
 
-
   //////////////////
-
-
-
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -123,7 +115,6 @@ export function EditLectureDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-
           <div className="space-y-2">
             <Label htmlFor="title">제목</Label>
             <Input
@@ -134,7 +125,6 @@ export function EditLectureDialog({
               }
             />
           </div>
-
 
           <div className="space-y-2">
             <Label>강의 영상</Label>
@@ -154,7 +144,7 @@ export function EditLectureDialog({
               • 지원 형식: .mp4, .mkv, .m4v, .mov
               <br />• 최소 해상도: 1080p 이상 (권장)
             </p>
-            
+
             <div
               {...getRootProps()}
               className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer ${
@@ -175,7 +165,6 @@ export function EditLectureDialog({
             </div>
           </div>
 
-
           <div className="space-y-2">
             <Label htmlFor="note">수업 노트</Label>
             <CKEditor
@@ -186,7 +175,6 @@ export function EditLectureDialog({
             />
           </div>
 
-
           <div className="flex justify-end space-x-2">
             <Button variant="outline" type="button" onClick={onClose}>
               취소
@@ -195,7 +183,6 @@ export function EditLectureDialog({
               {editLectureMutation.isPending ? "수정 중..." : "수정"}
             </Button>
           </div>
-          
         </form>
       </DialogContent>
     </Dialog>

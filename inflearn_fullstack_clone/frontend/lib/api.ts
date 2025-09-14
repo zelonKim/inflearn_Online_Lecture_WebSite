@@ -13,6 +13,7 @@ import {
   sectionsControllerDelete,
   sectionsControllerUpdate,
   UpdateCourseDto,
+  UpdateLectureDto,
   mediaControllerUploadMedia,
 } from "@/generated/openapi-client";
 
@@ -149,6 +150,19 @@ export const uploadMedia = async (file: File) => {
     body: {
       file,
     },
+  });
+  return { data, error };
+};
+
+export const updateLecture = async (
+  lectureId: string,
+  updateLectureDto: UpdateLectureDto
+) => {
+  const { data, error } = await lecturesControllerUpdate({
+    path: {
+      lectureId,
+    },
+    body: updateLectureDto,
   });
   return { data, error };
 };
