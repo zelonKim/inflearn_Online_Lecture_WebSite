@@ -76,6 +76,7 @@ export const updateCourse = async (
   return { data, error };
 };
 
+
 export const createSection = async (courseId: string, title: string) => {
   const { data, error } = await sectionsControllerCreate({
     path: {

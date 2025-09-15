@@ -8,6 +8,7 @@ import { LecturesModule } from './lectures/lectures.module';
 import { SectionsModule } from './sections/sections.module';
 import { CategoriesModule } from './categories/categories.module';
 import { MediaModule } from './media/media.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { MediaModule } from './media/media.module';
     SectionsModule,
     CategoriesModule,
     MediaModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

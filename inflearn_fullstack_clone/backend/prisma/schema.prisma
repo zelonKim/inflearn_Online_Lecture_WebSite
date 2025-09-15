@@ -100,7 +100,7 @@ model Course {
   level String @default("BEGINNER")
   status String @default("DRAFT")
   instructorId String @map("instructor_id")
-  isPublished Boolean @default(false) @map("is_published")
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 

@@ -8,10 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { User } from "next-auth";
 
 export default function SiteHeader({
+  user,
   categories,
 }: {
+  user: User | undefined;
   categories: CourseCategory[];
 }) {
   const pathname = usePathname();

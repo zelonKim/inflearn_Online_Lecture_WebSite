@@ -5,6 +5,7 @@ import Providers from "@/config/providers";
 import * as api from "@/lib/api";
 import SiteHeader from "@/components/site-header";
 import { Toaster } from "sonner";
+import { auth } from "@/auth";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,6 +27,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
   const categories = await api.getAllCategories();
 
   return (
@@ -34,7 +36,7 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
-          <SiteHeader categories={categories.data ?? []} />
+          <SiteHeader user={session?.user} categories={categories.data ?? []} />
           {children}
         </Providers>
         <Toaster />
