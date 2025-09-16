@@ -27,17 +27,25 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth();
-  const categories = await api.getAllCategories();
+  const [session, profile, categories] = await Promise.all([
+    auth(),
+    api.getProfile(),
+    api.getAllCategories(),
+  ]);
 
   return (
     <html lang="en">
       <body
+        suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
-          <SiteHeader user={session?.user} categories={categories.data ?? []} />
-          {children}
+          <SiteHeader
+            session={session}
+            profile={profile.data}
+            categories={categories.data ?? []}
+          />
+          <main>{children}</main>
         </Providers>
         <Toaster />
       </body>

@@ -15,6 +15,8 @@ import {
   UpdateCourseDto,
   UpdateLectureDto,
   mediaControllerUploadMedia,
+  usersControllerGetProfile,
+  usersControllerUpdateProfile,
 } from "@/generated/openapi-client";
 
 export const getAllCategories = async () => {
@@ -75,7 +77,6 @@ export const updateCourse = async (
 
   return { data, error };
 };
-
 
 export const createSection = async (courseId: string, title: string) => {
   const { data, error } = await sectionsControllerCreate({
@@ -164,6 +165,21 @@ export const updateLecture = async (
       lectureId,
     },
     body: updateLectureDto,
+  });
+  return { data, error };
+};
+
+
+
+
+export const getProfile = async () => {
+  const { data, error } = await usersControllerGetProfile();
+  return { data, error };
+};
+
+export const updateProfile = async (updateUserDto: UpdateUserDto) => {
+  const { data, error } = await usersControllerUpdateProfile({
+    body: updateUserDto,
   });
   return { data, error };
 };
