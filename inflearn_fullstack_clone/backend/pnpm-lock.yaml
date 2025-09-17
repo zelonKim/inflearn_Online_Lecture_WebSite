@@ -14,6 +14,9 @@ importers:
       '@ckeditor/ckeditor5-build-classic':
         specifier: ^44.3.0
         version: 44.3.0
+      '@nestjs/class-transformer':
+        specifier: ^0.4.0
+        version: 0.4.0
       '@nestjs/common':
         specifier: ^10.0.0
         version: 10.4.20(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -831,6 +834,9 @@ packages:
 
   '@mixmark-io/domino@2.2.0':
     resolution: {integrity: sha512-Y28PR25bHXUg88kCV7nivXrP2Nj2RueZ3/l/jdx6J9f8J4nsEGcgX0Qe6lt7Pa+J79+kPiJU3LguR6O/6zrLOw==}
+
+  '@nestjs/class-transformer@0.4.0':
+    resolution: {integrity: sha512-aHKhqPVixFCo8m7n2iP1uGgfyF0eYlAgGJKfW27l0BvRCTPBjmoL4956Cf9xVu6WNJzVsp//SOcpIavdnNHYZg==}
 
   '@nestjs/cli@10.4.9':
     resolution: {integrity: sha512-s8qYd97bggqeK7Op3iD49X2MpFtW4LVNLAwXFkfbRxKME6IYT7X0muNTJ2+QfI8hpbNx9isWkrLWIp+g5FOhiA==}
@@ -5386,6 +5392,8 @@ snapshots:
   '@microsoft/tsdoc@0.15.1': {}
 
   '@mixmark-io/domino@2.2.0': {}
+
+  '@nestjs/class-transformer@0.4.0': {}
 
   '@nestjs/cli@10.4.9':
     dependencies:

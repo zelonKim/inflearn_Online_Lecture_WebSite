@@ -17,6 +17,7 @@ import {
   mediaControllerUploadMedia,
   usersControllerGetProfile,
   usersControllerUpdateProfile,
+  coursesControllerSearch,
 } from "@/generated/openapi-client";
 
 export const getAllCategories = async () => {
@@ -169,9 +170,6 @@ export const updateLecture = async (
   return { data, error };
 };
 
-
-
-
 export const getProfile = async () => {
   const { data, error } = await usersControllerGetProfile();
   return { data, error };
@@ -180,6 +178,13 @@ export const getProfile = async () => {
 export const updateProfile = async (updateUserDto: UpdateUserDto) => {
   const { data, error } = await usersControllerUpdateProfile({
     body: updateUserDto,
+  });
+  return { data, error };
+};
+
+export const searchCourses = async (searchCourseDto: SearchCourseDto) => {
+  const { data, error } = await coursesControllerSearch({
+    body: searchCourseDto,
   });
   return { data, error };
 };

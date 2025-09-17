@@ -14,8 +14,6 @@ import {
   Layers,
 } from "lucide-react";
 
-
-
 export const CATEGORY_ICONS: { [key: string]: LucideIcon } = {
   "game-dev-all": Gamepad2,
   hardware: Cpu,
