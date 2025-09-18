@@ -10,13 +10,14 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Session, User } from "next-auth";
 import { CATEGORY_ICONS } from "@/app/constants/category-icons";
-import React from "react";
+import React, { useState } from "react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@radix-ui/react-popover";
 import { signOut } from "next-auth/react";
+import { useRouter } from "next/router";
 
 export default function SiteHeader({
   session,
@@ -30,6 +31,8 @@ export default function SiteHeader({
   const pathname = usePathname();
   const isSiteHeaderNeeded = !pathname.includes("/course/");
   const isCategoryNeeded = pathname == "/" || pathname.includes("/courses");
+  const [search, setSearch] = useState("");
+  const router = useRouter();
 
   if (!isSiteHeaderNeeded) return null;
 
@@ -71,11 +74,25 @@ export default function SiteHeader({
               type="text"
               placeholder="나의 진짜 성장을 도와줄 실무 강의를 찾아보세요"
               className="w-full bg-gray-50 border-gray-200 focus-visible:ring-[#1dc078] pr-10"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
             <button
               type="button"
               className="absolute right-2 p-1 text-gray-400 hover:text-[#1dc078] transition-colors"
               tabIndex={-1}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  if (search.trim()) {
+                    router.push(`/search?q=${search}`);
+                  }
+                }
+              }}
+              onClick={() => {
+                if (search.trim()) {
+                  router.push(`/search?q=${search}`);
+                }
+              }}
             >
               <Search size={20} />
             </button>
