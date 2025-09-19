@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -11,6 +12,8 @@ import slugfy from 'slug';
 import { SearchCourseDto } from './dto/search-course.dto';
 import { SearchCourseResponseDto } from './dto/search-response.dto';
 import { CourseDetailDto } from './dto/course-detail.dto';
+import { GetFavoriteResponseDto } from './dto/favorite.dto';
+import { CourseFavorite as CourseFavoriteEntity } from 'src/_gen/prisma-class/course_favorite';
 
 @Injectable()
 export class CoursesService {
@@ -48,7 +51,7 @@ export class CoursesService {
     });
   }
 
-  async findOne(id: string): Promise<CourseDetailDto | null> {
+  async findOne(id: string, userId?: string): Promise<CourseDetailDto | null> {
     const course = await this.prisma.course.findUnique({
       where: { id },
       include: {
@@ -103,6 +106,15 @@ export class CoursesService {
       },
     });
 
+    const isEnrolled = userId
+      ? !!(await this.prisma.courseEnrollment.findFirst({
+          where: {
+            userId,
+            courseId: id,
+          },
+        }))
+      : false;
+
     if (!course) {
       return null;
     }
@@ -125,6 +137,7 @@ export class CoursesService {
 
     const result = {
       ...course,
+      isEnrolled,
       totalEnrollments: course._count.enrollments,
       averageRating: Math.round(averageRating * 10) / 10,
       totalReviews: course._count.reviews,
@@ -135,8 +148,6 @@ export class CoursesService {
     return result as unknown as CourseDetailDto;
   }
 
-
-  
   async update(
     id: string,
     userId: string,
@@ -286,5 +297,131 @@ export class CoursesService {
         hasPrev,
       },
     };
+  }
+
+  async addFavorite(courseId: string, userId: string): Promise<boolean> {
+    try {
+      const existingFavorite = await this.prisma.courseFavorite.findFirst({
+        where: {
+          userId,
+          courseId,
+        },
+      });
+
+      if (existingFavorite) {
+        return true;
+      }
+
+      await this.prisma.courseFavorite.create({
+        data: {
+          userId,
+          courseId,
+        },
+      });
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  }
+
+  async removeFavorite(courseId: string, userId: string): Promise<boolean> {
+    try {
+      const existingFavorite = await this.prisma.courseFavorite.findFirst({
+        where: {
+          userId,
+          courseId,
+        },
+      });
+
+      if (existingFavorite) {
+        await this.prisma.courseFavorite.delete({
+          where: {
+            id: existingFavorite.id,
+          },
+        });
+        return true;
+      }
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  }
+
+  async getFavorite(
+    courseId: string,
+    userId?: string,
+  ): Promise<GetFavoriteResponseDto> {
+    const course = await this.prisma.course.findUnique({
+      where: {
+        id: courseId,
+      },
+      include: {
+        _count: {
+          select: {
+            favorites: true,
+          },
+        },
+      },
+    });
+
+    if (!course) {
+      throw new NotFoundException(`${course.id} 코스를 찾지 못했습니다.`);
+    }
+
+    if (userId) {
+      const existingFavoirte = await this.prisma.courseFavorite.findFirst({
+        where: {
+          userId,
+          courseId,
+        },
+      });
+      return {
+        isFavorite: !!existingFavoirte,
+        favoriteCount: course._count.favorites,
+      };
+    } else {
+      return {
+        isFavorite: false,
+        favoriteCount: course._count.favorites,
+      };
+    }
+  }
+
+  async getMyFavorites(userId: string): Promise<CourseFavoriteEntity[]> {
+    const existingFavoirtes = await this.prisma.courseFavorite.findMany({
+      where: {
+        userId,
+      },
+    });
+    return existingFavoirtes as unknown as CourseFavoriteEntity[];
+  }
+
+  
+  async enrollCourse(courseId: string, userId: string): Promise<boolean> {
+    try {
+      const existingEnrollment = await this.prisma.courseEnrollment.findFirst({
+        where: {
+          userId,
+          courseId,
+        },
+      });
+
+      if (existingEnrollment) {
+        throw new ConflictException('이미 수강신청한 강의입니다.');
+      }
+
+      await this.prisma.courseEnrollment.create({
+        data: {
+          userId,
+          courseId,
+          enrolledAt: new Date(),
+        },
+      });
+      return true;
+    } catch (err) {
+      throw new Error(err);
+    }
   }
 }

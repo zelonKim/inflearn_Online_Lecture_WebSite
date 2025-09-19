@@ -17,10 +17,9 @@ export class MediaService {
     this.cloudFrontDomain = process.env.CLOUDFRONT_DOMAIN;
   }
 
-
   async uploadMedia(file: Express.Multer.File, userId: string) {
     const fileExtension = file.originalname.split('.').pop();
-    const key = `media/${userId}/${uuid()}.${fileExtension}`;
+    const key = `media/${userId}/${fileExtension}`;
 
     const res = await this.s3Client.send(
       new PutObjectCommand({
@@ -50,7 +49,6 @@ export class MediaService {
     };
   }
 
-  
   getMediaUrl(key: string) {
     return `https://${this.cloudFrontDomain}/${key}`;
   }

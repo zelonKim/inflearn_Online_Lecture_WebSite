@@ -2,31 +2,41 @@
 
 import {
   CourseDetailDto,
-  Section,
-  Lecture,
-  CourseReview,
-  User,
+  Section as SectionEntity,
+  Lecture as LectureEntity,
+  CourseReview as CourseReviewEntity,
+  User as UserEntity,
 } from "@/generated/openapi-client";
-
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-
 import Image from "next/image";
-
 import {
   StarIcon,
   PlayCircleIcon,
   LockIcon,
   ShoppingCartIcon,
+  HeartIcon,
 } from "lucide-react";
-
 import { cn } from "@/lib/utils";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { getLevelText } from "@/lib/level";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import * as api from "@/lib/api";
+import { User } from "next-auth";
+import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useRouter } from "next/navigation";
 
 /*****************
  * Helper Utils  *
@@ -47,7 +57,6 @@ function formatSecondsToHourMin(seconds: number) {
   if (hrs === 0) return `${mins}분`;
   return `${hrs}시간 ${mins}분`;
 }
-
 
 function formatDate(date: string) {
   return new Date(date).toLocaleDateString("ko-KR", {
@@ -139,7 +148,7 @@ function Header({ course }: { course: CourseDetailDto }) {
   );
 }
 
-function LatestReviews({ reviews }: { reviews: CourseReview[] }) {
+function LatestReviews({ reviews }: { reviews: CourseReviewEntity[] }) {
   if (!reviews.length) return null;
   const latest = [...reviews]
     .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))
@@ -215,7 +224,7 @@ function LectureRow({
   lecture,
   className,
 }: {
-  lecture: Lecture;
+  lecture: LectureEntity;
   className?: string;
 }) {
   return (
@@ -248,7 +257,7 @@ function LectureRow({
   );
 }
 
-function Curriculum({ sections }: { sections: Section[] }) {
+function Curriculum({ sections }: { sections: SectionEntity[] }) {
   return (
     <section id="curriculum" className="mt-12">
       <h2 className="text-2xl font-bold mb-6">커리큘럼</h2>
@@ -291,7 +300,7 @@ function Curriculum({ sections }: { sections: Section[] }) {
   );
 }
 
-function ReviewsSection({ reviews }: { reviews: CourseReview[] }) {
+function ReviewsSection({ reviews }: { reviews: CourseReviewEntity[] }) {
   if (!reviews.length) return null;
   return (
     <section id="reviews" className="mt-12">
@@ -335,7 +344,7 @@ function ReviewsSection({ reviews }: { reviews: CourseReview[] }) {
   );
 }
 
-function InstructorBio({ instructor }: { instructor: User }) {
+function InstructorBio({ instructor }: { instructor: UserEntity }) {
   return (
     <>
       <hr className="border-t border-gray-200 my-12" />
@@ -374,73 +383,254 @@ function InstructorBio({ instructor }: { instructor: User }) {
   );
 }
 
-function FloatingMenu({ course }: { course: CourseDetailDto }) {
+
+
+function FloatingMenu({
+  user,
+  course,
+}: {
+  user?: User;
+  course: CourseDetailDto;
+}) {
+  const [isEnrolled, setIsEnrolled] = useState(course.isEnrolled);
+  const [showEnrollSuccessDialog, setShowEnrollSuccessDialog] = useState(false);
+  const router = useRouter();
+
+
+  const getFavoriteQuery = useQuery({
+    queryKey: ["favorite", course.id],
+    queryFn: () => api.getFavorite(course.id),
+  });
+
   const handleCart = useCallback(() => {
     alert("장바구니 기능은 준비 중입니다.");
   }, []);
 
+
+  const addFavoriteMutation = useMutation({
+    mutationFn: () => api.addFavorite(course.id),
+    onSuccess: () => {
+      getFavoriteQuery.refetch();
+    },
+  });
+
+
+  const removeFavoriteMutation = useMutation({
+    mutationFn: () => {
+      return api.removeFavorite(course.id);
+    },
+    onSuccess: () => {
+      getFavoriteQuery.refetch();
+    },
+  });
+
+
+  const isFavoriteDisabled =
+    addFavoriteMutation.isPending || removeFavoriteMutation.isPending;
+
+
+  const handleFavorite = useCallback(() => {
+    if (user) {
+      if (getFavoriteQuery.data?.data?.isFavorite) {
+        removeFavoriteMutation.mutate();
+      } else {
+        addFavoriteMutation.mutate();
+      }
+    } else {
+      alert("로그인 후 이용해주세요.");
+    }
+  }, [user, getFavoriteQuery, addFavoriteMutation, removeFavoriteMutation]);
+
+
+
+  const enrollMutation = useMutation({
+    mutationFn: () => api.enrollCourse(course.id),
+    onSuccess: () => {
+      setIsEnrolled(true);
+      setShowEnrollSuccessDialog(true);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+
+  const handleEnroll = useCallback(() => {
+    if (isEnrolled) {
+      alert("이미 수강신청한 강의입니다. 수강 화면으로 이동해주세요.");
+      return;
+    }
+
+    if (!user) {
+      alert("로그인 후 이용해주세요.");
+      return;
+    }
+
+    if (course.price > 0) {
+      alert("결제는 추후 구현 예정입니다. 무료 강의를 이용해주세요.");
+      return;
+    }
+
+    enrollMutation.mutate();
+  }, [course, user, enrollMutation, isEnrolled]);
+
+
+  const handleStartLearning = () => {
+    setShowEnrollSuccessDialog(false);
+    router.push(`/courses/lecture?courseId=${course.id}`);
+  };
+
+
   return (
-    <aside className="lg:sticky lg:top-24 lg:self-start lg:block hidden">
-      <div className="border rounded-md w-80">
-        <div className="p-6 space-y-4">
-          {/* 가격 */}
-          <div>
-            {course.discountPrice ? (
-              <>
-                <span className="text-2xl font-bold text-primary">
-                  {course.discountPrice.toLocaleString()}원
-                </span>
-                <span className="ml-2 line-through text-muted-foreground">
-                  {course.price.toLocaleString()}원
-                </span>
-              </>
+    <>
+      <aside className="lg:sticky lg:top-24 lg:self-start lg:block hidden">
+        <div className="border rounded-md w-80">
+          <div className="p-6 space-y-4">
+            {/* 가격 */}
+            <div>
+              {course.price > 0 &&
+                (course.discountPrice ? (
+                  <>
+                    <span className="text-2xl font-bold text-primary">
+                      {course.discountPrice.toLocaleString()}원
+                    </span>
+                    <span className="ml-2 line-through text-muted-foreground">
+                      {course.price?.toLocaleString()}원
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-2xl font-bold">
+                    {course.price?.toLocaleString()}원
+                  </span>
+                ))}
+              {course.price === 0 && (
+                <span className="text-2xl font-bold">무료</span>
+              )}
+            </div>
+
+
+            {isEnrolled ? (
+              <button
+                onClick={() => {
+                  router.push(`/courses/lecture?courseId=${course.id}`);
+                }}
+                className={cn(
+                  "cursor-pointer w-full py-2 px-4 rounded-md bg-primary text-white font-semibold"
+                )}
+              >
+                학습으로 이동하기
+              </button>
             ) : (
-              <span className="text-2xl font-bold">
-                {course.price.toLocaleString()}원
-              </span>
+              <button
+                onClick={handleEnroll}
+                disabled={enrollMutation.isPending}
+                className={cn(
+                  "cursor-pointer w-full py-2 px-4 rounded-md bg-primary text-white font-semibold",
+                  enrollMutation.isPending && "cursor-not-allowed"
+                )}
+              >
+                수강신청 하기
+              </button>
             )}
+
+
+            <button
+              onClick={handleCart}
+              className="cursor-pointer w-full py-2 px-4 rounded-md border font-medium"
+            >
+              바구니에 담기
+            </button>
+
+
+            <button
+              onClick={handleFavorite}
+              disabled={isFavoriteDisabled}
+              className={cn(
+                "cursor-pointer w-full py-2 px-4 rounded-md border font-medium flex items-center justify-center gap-2 transition-colors",
+                getFavoriteQuery.data?.data?.isFavorite
+                  ? "bg-red-50 border-red-200 text-red-600 hover:bg-red-100"
+                  : "hover:bg-gray-50",
+                isFavoriteDisabled && "cursor-not-allowed"
+              )}
+            >
+
+              <HeartIcon
+                className={cn(
+                  "size-4 transition-colors",
+                  getFavoriteQuery.data?.data?.isFavorite
+                    ? "fill-red-500 text-red-500"
+                    : "text-gray-500",
+                  isFavoriteDisabled && "cursor-not-allowed"
+                )}
+              />
+              {getFavoriteQuery.data?.data?.favoriteCount ?? 0}
+            </button>
+
           </div>
-          <button className="w-full py-2 px-4 rounded-md bg-primary text-white font-semibold">
-            수강신청 하기
-          </button>
-          <button
-            onClick={handleCart}
-            className="w-full py-2 px-4 rounded-md border font-medium"
-          >
-            바구니에 담기
-          </button>
-          <button
-            disabled
-            className="w-full py-2 px-4 rounded-md border font-medium text-muted-foreground cursor-not-allowed"
-          >
-            즐겨찾기 (준비중)
-          </button>
+
+        
+          <div className="bg-[#F8F9FA] p-6 space-y-1 text-sm rounded-b-md">
+            <p>
+              <strong>지식공유자:</strong> {course.instructor.name}
+            </p>
+            <p>
+              <strong>강의 수:</strong> {course.totalLectures}개
+            </p>
+            <p>
+              <strong>강의 시간:</strong>{" "}
+              {formatSecondsToHourMin(course.totalDuration)}
+            </p>
+            <p>
+              <strong>난이도:</strong> {getLevelText(course.level)}
+            </p>
+          </div>
         </div>
-        {/* info section */}
-        <div className="bg-[#F8F9FA] p-6 space-y-1 text-sm rounded-b-md">
-          <p>
-            <strong>지식공유자:</strong> {course.instructor.name}
-          </p>
-          <p>
-            <strong>강의 수:</strong> {course.totalLectures}개
-          </p>
-          <p>
-            <strong>강의 시간:</strong>{" "}
-            {formatSecondsToHourMin(course.totalDuration)}
-          </p>
-          <p>
-            <strong>난이도:</strong> {getLevelText(course.level)}
-          </p>
-        </div>
-      </div>
-    </aside>
+      </aside>
+
+      {/* 수강신청 완료 다이얼로그 */}
+      <Dialog
+        open={showEnrollSuccessDialog}
+        onOpenChange={setShowEnrollSuccessDialog}
+      >
+        <DialogContent>
+
+          <DialogHeader>
+            <DialogTitle>수강신청 완료</DialogTitle>
+            <DialogDescription>
+              수강신청이 완료되었어요. 강의실로 이동하여 바로 학습하시겠어요?
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter>
+            <button
+              onClick={() => setShowEnrollSuccessDialog(false)}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+            >
+              취소
+            </button>
+
+            <button
+              onClick={handleStartLearning}
+              className="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-md transition-colors"
+            >
+              바로 학습 시작
+            </button>
+          </DialogFooter>
+
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
+
+
 function MobileBottomBar({ course }: { course: CourseDetailDto }) {
+
   const handleCart = () => {
     alert("장바구니 기능은 준비 중입니다.");
   };
+
   return (
     <div className="lg:hidden fixed bottom-0 inset-x-0 border-t bg-white flex items-center gap-4 px-4 py-3 z-50 shadow">
       <div className="flex-1">
@@ -450,18 +640,20 @@ function MobileBottomBar({ course }: { course: CourseDetailDto }) {
               {course.discountPrice.toLocaleString()}원
             </span>
             <span className="ml-2 line-through text-muted-foreground text-sm">
-              {course.price.toLocaleString()}원
+              {course.price?.toLocaleString()}원
             </span>
           </>
         ) : (
           <span className="font-bold text-lg">
-            {course.price.toLocaleString()}원
+            {course.price?.toLocaleString()}원
           </span>
         )}
       </div>
+
       <button className="flex-1 py-2 rounded-md bg-primary text-white font-semibold">
         수강신청
       </button>
+
       <button
         onClick={handleCart}
         className="p-2 rounded-md border font-medium"
@@ -473,32 +665,29 @@ function MobileBottomBar({ course }: { course: CourseDetailDto }) {
   );
 }
 
-/*****************
- * Main Component *
- *****************/
+
+
 export default function CourseDetailUI({
   course,
+  user,
 }: {
   course: CourseDetailDto;
+  user?: User;
 }) {
   return (
-    <div className="mx-auto px-4 py-12 pb-24 lg:pb-12">
+    <div className="mx-auto px-4 pb-24 lg:pb-12">
       <Header course={course} />
 
       <div className="mt-12 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-10">
-        {/* Main content */}
         <div className="max-w-3xl">
           <Introduction course={course} />
           <InstructorBio instructor={course.instructor} />
           <Curriculum sections={course.sections} />
           <ReviewsSection reviews={course.reviews} />
         </div>
-
-        {/* Floating menu */}
-        <FloatingMenu course={course} />
+        <FloatingMenu user={user} course={course} />
       </div>
 
-      {/* 모바일 하단 바 */}
       <MobileBottomBar course={course} />
     </div>
   );

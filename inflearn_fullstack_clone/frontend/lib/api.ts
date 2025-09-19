@@ -18,6 +18,13 @@ import {
   usersControllerGetProfile,
   usersControllerUpdateProfile,
   coursesControllerSearch,
+  SearchCourseDto,
+  UpdateUserDto,
+  coursesControllerAddFavorite,
+  coursesControllerRemoveFavorite,
+  coursesControllerGetFavorite,
+  coursesControllerGetMyFavorites,
+  coursesControllerEnrollCourse,
 } from "@/generated/openapi-client";
 
 export const getAllCategories = async () => {
@@ -182,6 +189,47 @@ export const updateProfile = async (updateUserDto: UpdateUserDto) => {
 export const searchCourses = async (searchCourseDto: SearchCourseDto) => {
   const { data, error } = await coursesControllerSearch({
     body: searchCourseDto,
+  });
+  return { data, error };
+};
+
+export const addFavorite = async (courseId: string) => {
+  const { data, error } = await coursesControllerAddFavorite({
+    path: {
+      id: courseId,
+    },
+  });
+  return { data, error };
+};
+
+export const removeFavorite = async (courseId: string) => {
+  const { data, error } = await coursesControllerRemoveFavorite({
+    path: {
+      id: courseId,
+    },
+  });
+  return { data, error };
+};
+
+export const getFavorite = async (courseId: string) => {
+  const { data, error } = await coursesControllerGetFavorite({
+    path: {
+      id: courseId,
+    },
+  });
+  return { data, error };
+};
+
+export const getMyFavorites = async () => {
+  const { data, error } = await coursesControllerGetMyFavorites();
+  return { data, error };
+};
+
+export const enrollCourse = async (courseId: string) => {
+  const { data, error } = await coursesControllerEnrollCourse({
+    path: {
+      id: courseId,
+    },
   });
   return { data, error };
 };
