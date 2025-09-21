@@ -20,6 +20,7 @@ import {
   LockIcon,
   ShoppingCartIcon,
   HeartIcon,
+  Router,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCallback, useState } from "react";
@@ -221,16 +222,25 @@ function Introduction({ course }: { course: CourseDetailDto }) {
 }
 
 function LectureRow({
+  courseId,
   lecture,
   className,
 }: {
+  courseId: string;
   lecture: LectureEntity;
   className?: string;
 }) {
+  const router = useRouter();
   return (
     <div
+      onClick={() => {
+        router.push(
+          `/courses/lecture?courseId=${courseId}&lectureId=${lecture.id}`
+        );
+      }}
       className={cn(
         "flex items-center justify-between text-sm px-4 py-3",
+        lecture.videoStorageInfo && "cursor-pointer",
         className
       )}
     >
@@ -240,14 +250,13 @@ function LectureRow({
         ) : (
           <LockIcon className="size-4 text-muted-foreground" />
         )}
-        <span>{lecture.title}</span>
+        <span className={lecture.videoStorageInfo && "underline"}>
+          {lecture.title}
+        </span>
       </div>
       <div className="flex items-center gap-2">
         {lecture.isPreview && (
-          <button
-            onClick={() => alert("구현 예정")}
-            className="cursor-pointer text-sm px-2 py-1 border border-gray-400 text-gray-800 font-semibold rounded-md"
-          >
+          <button className="cursor-pointer text-sm px-2 py-1 border border-gray-400 text-gray-800 font-semibold rounded-md">
             미리보기
           </button>
         )}
@@ -257,7 +266,13 @@ function LectureRow({
   );
 }
 
-function Curriculum({ sections }: { sections: SectionEntity[] }) {
+function Curriculum({
+  courseId,
+  sections,
+}: {
+  courseId: string;
+  sections: SectionEntity[];
+}) {
   return (
     <section id="curriculum" className="mt-12">
       <h2 className="text-2xl font-bold mb-6">커리큘럼</h2>
@@ -282,6 +297,7 @@ function Curriculum({ sections }: { sections: SectionEntity[] }) {
                     .map((lecture, idx) => (
                       <LectureRow
                         key={lecture.id}
+                        courseId={courseId}
                         lecture={lecture}
                         className={cn(
                           "h-12",
@@ -383,8 +399,6 @@ function InstructorBio({ instructor }: { instructor: UserEntity }) {
   );
 }
 
-
-
 function FloatingMenu({
   user,
   course,
@@ -396,7 +410,6 @@ function FloatingMenu({
   const [showEnrollSuccessDialog, setShowEnrollSuccessDialog] = useState(false);
   const router = useRouter();
 
-
   const getFavoriteQuery = useQuery({
     queryKey: ["favorite", course.id],
     queryFn: () => api.getFavorite(course.id),
@@ -406,14 +419,12 @@ function FloatingMenu({
     alert("장바구니 기능은 준비 중입니다.");
   }, []);
 
-
   const addFavoriteMutation = useMutation({
     mutationFn: () => api.addFavorite(course.id),
     onSuccess: () => {
       getFavoriteQuery.refetch();
     },
   });
-
 
   const removeFavoriteMutation = useMutation({
     mutationFn: () => {
@@ -424,10 +435,8 @@ function FloatingMenu({
     },
   });
 
-
   const isFavoriteDisabled =
     addFavoriteMutation.isPending || removeFavoriteMutation.isPending;
-
 
   const handleFavorite = useCallback(() => {
     if (user) {
@@ -441,8 +450,6 @@ function FloatingMenu({
     }
   }, [user, getFavoriteQuery, addFavoriteMutation, removeFavoriteMutation]);
 
-
-
   const enrollMutation = useMutation({
     mutationFn: () => api.enrollCourse(course.id),
     onSuccess: () => {
@@ -453,7 +460,6 @@ function FloatingMenu({
       toast.error(error.message);
     },
   });
-
 
   const handleEnroll = useCallback(() => {
     if (isEnrolled) {
@@ -474,12 +480,10 @@ function FloatingMenu({
     enrollMutation.mutate();
   }, [course, user, enrollMutation, isEnrolled]);
 
-
   const handleStartLearning = () => {
     setShowEnrollSuccessDialog(false);
     router.push(`/courses/lecture?courseId=${course.id}`);
   };
-
 
   return (
     <>
@@ -508,7 +512,6 @@ function FloatingMenu({
               )}
             </div>
 
-
             {isEnrolled ? (
               <button
                 onClick={() => {
@@ -533,14 +536,12 @@ function FloatingMenu({
               </button>
             )}
 
-
             <button
               onClick={handleCart}
               className="cursor-pointer w-full py-2 px-4 rounded-md border font-medium"
             >
               바구니에 담기
             </button>
-
 
             <button
               onClick={handleFavorite}
@@ -553,7 +554,6 @@ function FloatingMenu({
                 isFavoriteDisabled && "cursor-not-allowed"
               )}
             >
-
               <HeartIcon
                 className={cn(
                   "size-4 transition-colors",
@@ -565,10 +565,8 @@ function FloatingMenu({
               />
               {getFavoriteQuery.data?.data?.favoriteCount ?? 0}
             </button>
-
           </div>
 
-        
           <div className="bg-[#F8F9FA] p-6 space-y-1 text-sm rounded-b-md">
             <p>
               <strong>지식공유자:</strong> {course.instructor.name}
@@ -593,7 +591,6 @@ function FloatingMenu({
         onOpenChange={setShowEnrollSuccessDialog}
       >
         <DialogContent>
-
           <DialogHeader>
             <DialogTitle>수강신청 완료</DialogTitle>
             <DialogDescription>
@@ -616,17 +613,13 @@ function FloatingMenu({
               바로 학습 시작
             </button>
           </DialogFooter>
-
         </DialogContent>
       </Dialog>
     </>
   );
 }
 
-
-
 function MobileBottomBar({ course }: { course: CourseDetailDto }) {
-
   const handleCart = () => {
     alert("장바구니 기능은 준비 중입니다.");
   };
@@ -665,8 +658,6 @@ function MobileBottomBar({ course }: { course: CourseDetailDto }) {
   );
 }
 
-
-
 export default function CourseDetailUI({
   course,
   user,
@@ -682,7 +673,7 @@ export default function CourseDetailUI({
         <div className="max-w-3xl">
           <Introduction course={course} />
           <InstructorBio instructor={course.instructor} />
-          <Curriculum sections={course.sections} />
+          <Curriculum courseId={course.id} sections={course.sections} />
           <ReviewsSection reviews={course.reviews} />
         </div>
         <FloatingMenu user={user} course={course} />

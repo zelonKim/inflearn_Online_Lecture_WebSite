@@ -3,7 +3,7 @@
 import {
   categoriesControllerFindAll,
   coursesControllerCreate,
-  coursesControllerFindAll,
+  coursesControllerFindAllMyCourses,
   coursesControllerFindOne,
   coursesControllerUpdate,
   lecturesControllerCreate,
@@ -25,6 +25,9 @@ import {
   coursesControllerGetFavorite,
   coursesControllerGetMyFavorites,
   coursesControllerEnrollCourse,
+  lecturesControllerUpdateLectureActivity,
+  UpdateLectureActivityDto,
+  coursesControllerGetLectureActivity,
 } from "@/generated/openapi-client";
 
 export const getAllCategories = async () => {
@@ -37,7 +40,7 @@ export const getAllCategories = async () => {
 };
 
 export const getAllInstructorCourses = async () => {
-  const { data, error } = await coursesControllerFindAll();
+  const { data, error } = await coursesControllerFindAllMyCourses();
   return {
     data,
     error,
@@ -229,6 +232,31 @@ export const enrollCourse = async (courseId: string) => {
   const { data, error } = await coursesControllerEnrollCourse({
     path: {
       id: courseId,
+    },
+  });
+  return { data, error };
+};
+
+
+
+
+export const updateLectureActivity = async (
+  lectureId: string,
+  updateLectureActivityDto: UpdateLectureActivityDto
+) => {
+  const { data, error } = await lecturesControllerUpdateLectureActivity({
+    path: {
+      lectureId,
+    },
+    body: updateLectureActivityDto,
+  });
+  return { data, error };
+};
+
+export const getAllLectureActivities = async (courseId: string) => {
+  const { data, error } = await coursesControllerGetLectureActivity({
+    path: {
+      courseId,
     },
   });
   return { data, error };

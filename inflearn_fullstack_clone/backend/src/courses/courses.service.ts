@@ -86,6 +86,7 @@ export class CoursesService {
                 isPreview: true,
                 duration: true,
                 order: true,
+                videoStorageInfo: true,
               },
               orderBy: {
                 order: 'asc',
@@ -105,6 +106,8 @@ export class CoursesService {
         },
       },
     });
+
+    const isInstructor = course.instructorId === userId;
 
     const isEnrolled = userId
       ? !!(await this.prisma.courseEnrollment.findFirst({
@@ -135,8 +138,22 @@ export class CoursesService {
       0,
     );
 
+    const sectionsWithFilteredVideoStorageInfo = course.sections.map(
+      (section) => ({
+        ...section,
+        lectures: section.lectures.map((lecture) => ({
+          ...lecture,
+          videoStorageInfo:
+            isInstructor || isEnrolled || lecture.isPreview
+              ? lecture.videoStorageInfo
+              : null,
+        })),
+      }),
+    );
+
     const result = {
       ...course,
+      sections: sectionsWithFilteredVideoStorageInfo,
       isEnrolled,
       totalEnrollments: course._count.enrollments,
       averageRating: Math.round(averageRating * 10) / 10,
@@ -398,7 +415,6 @@ export class CoursesService {
     return existingFavoirtes as unknown as CourseFavoriteEntity[];
   }
 
-  
   async enrollCourse(courseId: string, userId: string): Promise<boolean> {
     try {
       const existingEnrollment = await this.prisma.courseEnrollment.findFirst({
@@ -423,5 +439,16 @@ export class CoursesService {
     } catch (err) {
       throw new Error(err);
     }
+  }
+
+  async getAllLectureActivities(courseId: string, userId: string) {
+    const courseActivities = await this.prisma.lectureActivity.findMany({
+      where: {
+        userId,
+        courseId,
+      },
+    });
+
+    return courseActivities;
   }
 }
