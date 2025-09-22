@@ -19,6 +19,7 @@ import {
   ArrowLeftIcon,
   CheckCircle2,
   LockIcon,
+  MessageSquareIcon,
   PlayCircleIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -44,6 +45,7 @@ import {
 } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import * as api from "@/lib/api";
+import { User } from "next-auth";
 
 /*****************
  * Helper Utils  *
@@ -384,6 +386,16 @@ function VideoPlayer({
           </div>
 
           <div className="flex items-center gap-3">
+            {user && (
+              <button
+                onClick={() => setShowReviewModal(true)}
+                className="flex items-center gap-1 px-3 py-1 bg-green-600 hover:bg-green-700 text-white"
+                aria-label="수강평 작성"
+              >
+                <MessageSquareIcon className="size-3" />
+                <span>수강평</span>
+              </button>
+            )}
             {/* speed select */}
             <Select
               value={playbackRate.toString()}
@@ -455,10 +467,12 @@ export default function UI({
   course,
   lectureId,
   lectureActivities,
+  user,
 }: {
   course: CourseDetailDto;
   lectureId?: string;
   lectureActivities: LectureActivityEntity;
+  user?: User;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();

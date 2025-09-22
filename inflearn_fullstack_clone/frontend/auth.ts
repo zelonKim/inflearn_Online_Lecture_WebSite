@@ -67,4 +67,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return jwt.verify(token as string, secret as string) as JWT;
     },
   },
+  pages: {},
+  callbacks: {
+    jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
+    session({ session, token }) {
+      (session as any).user.id = token.id;
+      return session;
+    },
+  },
 });

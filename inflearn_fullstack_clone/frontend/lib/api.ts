@@ -2,32 +2,39 @@
 
 import {
   categoriesControllerFindAll,
+  coursesControllerAddFavorite,
   coursesControllerCreate,
+  coursesControllerCreateReview,
+  coursesControllerDeleteReview,
+  coursesControllerEnrollCourse,
   coursesControllerFindAllMyCourses,
   coursesControllerFindOne,
+  coursesControllerGetCourseReviews,
+  coursesControllerGetFavorite,
+  coursesControllerGetLectureActivity,
+  coursesControllerGetMyFavorites,
+  coursesControllerRemoveFavorite,
+  coursesControllerSearch,
   coursesControllerUpdate,
+  CoursesControllerUpdateData,
+  coursesControllerUpdateReview,
+  CreateReviewDto,
   lecturesControllerCreate,
   lecturesControllerDelete,
   lecturesControllerUpdate,
+  lecturesControllerUpdateLectureActivity,
+  mediaControllerUploadMedia,
+  SearchCourseDto,
   sectionsControllerCreate,
   sectionsControllerDelete,
   sectionsControllerUpdate,
   UpdateCourseDto,
+  UpdateLectureActivityDto,
   UpdateLectureDto,
-  mediaControllerUploadMedia,
+  UpdateReviewDto,
+  UpdateUserDto,
   usersControllerGetProfile,
   usersControllerUpdateProfile,
-  coursesControllerSearch,
-  SearchCourseDto,
-  UpdateUserDto,
-  coursesControllerAddFavorite,
-  coursesControllerRemoveFavorite,
-  coursesControllerGetFavorite,
-  coursesControllerGetMyFavorites,
-  coursesControllerEnrollCourse,
-  lecturesControllerUpdateLectureActivity,
-  UpdateLectureActivityDto,
-  coursesControllerGetLectureActivity,
 } from "@/generated/openapi-client";
 
 export const getAllCategories = async () => {
@@ -41,18 +48,7 @@ export const getAllCategories = async () => {
 
 export const getAllInstructorCourses = async () => {
   const { data, error } = await coursesControllerFindAllMyCourses();
-  return {
-    data,
-    error,
-  };
-};
 
-export const createCourse = async (title: string) => {
-  const { data, error } = await coursesControllerCreate({
-    body: {
-      title,
-    },
-  });
   return {
     data,
     error,
@@ -63,6 +59,19 @@ export const getCourseById = async (id: string) => {
   const { data, error } = await coursesControllerFindOne({
     path: {
       id,
+    },
+  });
+
+  return {
+    data,
+    error,
+  };
+};
+
+export const createCourse = async (title: string) => {
+  const { data, error } = await coursesControllerCreate({
+    body: {
+      title,
     },
   });
 
@@ -95,6 +104,7 @@ export const createSection = async (courseId: string, title: string) => {
       title,
     },
   });
+
   return { data, error };
 };
 
@@ -116,6 +126,7 @@ export const createLecture = async (sectionId: string, title: string) => {
       title,
     },
   });
+
   return { data, error };
 };
 
@@ -125,6 +136,7 @@ export const deleteLecture = async (lectureId: string) => {
       lectureId,
     },
   });
+
   return { data, error };
 };
 
@@ -152,15 +164,7 @@ export const updateLecturePreview = async (
       isPreview,
     },
   });
-  return { data, error };
-};
 
-export const uploadMedia = async (file: File) => {
-  const { data, error } = await mediaControllerUploadMedia({
-    body: {
-      file,
-    },
-  });
   return { data, error };
 };
 
@@ -174,6 +178,17 @@ export const updateLecture = async (
     },
     body: updateLectureDto,
   });
+
+  return { data, error };
+};
+
+export const uploadMedia = async (file: File) => {
+  const { data, error } = await mediaControllerUploadMedia({
+    body: {
+      file,
+    },
+  });
+
   return { data, error };
 };
 
@@ -186,6 +201,7 @@ export const updateProfile = async (updateUserDto: UpdateUserDto) => {
   const { data, error } = await usersControllerUpdateProfile({
     body: updateUserDto,
   });
+
   return { data, error };
 };
 
@@ -193,6 +209,7 @@ export const searchCourses = async (searchCourseDto: SearchCourseDto) => {
   const { data, error } = await coursesControllerSearch({
     body: searchCourseDto,
   });
+
   return { data, error };
 };
 
@@ -202,6 +219,7 @@ export const addFavorite = async (courseId: string) => {
       id: courseId,
     },
   });
+
   return { data, error };
 };
 
@@ -211,6 +229,7 @@ export const removeFavorite = async (courseId: string) => {
       id: courseId,
     },
   });
+
   return { data, error };
 };
 
@@ -220,11 +239,13 @@ export const getFavorite = async (courseId: string) => {
       id: courseId,
     },
   });
+
   return { data, error };
 };
 
 export const getMyFavorites = async () => {
   const { data, error } = await coursesControllerGetMyFavorites();
+
   return { data, error };
 };
 
@@ -234,11 +255,9 @@ export const enrollCourse = async (courseId: string) => {
       id: courseId,
     },
   });
+
   return { data, error };
 };
-
-
-
 
 export const updateLectureActivity = async (
   lectureId: string,
@@ -250,6 +269,7 @@ export const updateLectureActivity = async (
     },
     body: updateLectureActivityDto,
   });
+
   return { data, error };
 };
 
@@ -259,5 +279,66 @@ export const getAllLectureActivities = async (courseId: string) => {
       courseId,
     },
   });
+
+  return { data, error };
+};
+
+export const getCourseReviews = async (
+  courseId: string,
+  page: number,
+  pageSize: number,
+  sort: "latest" | "oldest" | "rating_high" | "rating_low" = "latest"
+) => {
+  const { data, error } = await coursesControllerGetCourseReviews({
+    path: {
+      courseId,
+    },
+    query: {
+      page,
+      pageSize,
+      sort,
+    },
+  });
+
+  return { data, error };
+};
+
+export const createReview = async (
+  courseId: string,
+  createReveiwDto: CreateReviewDto
+) => {
+  const { data, error } = await coursesControllerCreateReview({
+    path: {
+      courseId,
+    },
+    body: createReveiwDto,
+  });
+
+  return { data, error };
+};
+
+
+export const updateReview = async (
+  reviewId: string,
+  updateReviewDto: UpdateReviewDto
+) => {
+  const { data, error } = await coursesControllerUpdateReview({
+    path: {
+      reviewId,
+    },
+    body: updateReviewDto,
+  });
+
+  return { data, error };
+};
+
+
+export const deleteReview = async (reviewId: string) => {
+  const { data, error } = await coursesControllerDeleteReview({
+    path: {
+      reviewId,
+    },
+  });
+
   return { data, error };
 };
