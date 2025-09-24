@@ -11,7 +11,7 @@ const sidebarItems = [
   },
   {
     label: "새 강의 만들기",
-    href: "/create_courses"
+    href: "/create_courses",
   },
   {
     label: "강의 관리",
@@ -27,7 +27,7 @@ const sidebarItems = [
   },
   {
     label: "강의 질문 관리",
-    href: "/instructor#",
+    href: "/instructor/questions",
   },
   {
     label: "수강평 리스트",
@@ -35,15 +35,15 @@ const sidebarItems = [
   },
   {
     label: "새소식 관리",
-    href: "/instructor#"
+    href: "/instructor#",
   },
   {
     label: "수익 확인",
-    href: "/instructor#"
+    href: "/instructor#",
   },
   {
     label: "쿠폰 관리",
-    href: "/instructor#"
+    href: "/instructor#",
   },
 ];
 
@@ -52,8 +52,8 @@ export default function InstructorSideBar() {
   const [selectionTab, setSelectionTab] = useState("");
 
   const alertPreparing = () => {
-    alert("준비중입니다.")
-  }
+    alert("준비중입니다.");
+  };
 
   return (
     <aside className="w-full max-w-[260px] flex flex-col gap-2 p-4 border-r bg-white min-h-screen">

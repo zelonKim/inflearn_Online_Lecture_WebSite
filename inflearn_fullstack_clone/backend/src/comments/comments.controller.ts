@@ -15,6 +15,7 @@ import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { CourseComment as CourseCommentEntity } from 'src/_gen/prisma-class/course_comment';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { Request } from 'express';
 
 @ApiTags('댓글')
 @Controller('comments')

@@ -11,6 +11,33 @@ import { UpdateQuestionDto } from './dto/update-question.dto';
 export class QuestionsService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async findAllByInstructorId(instructorId: string) {
+    const allQuestions = await this.prisma.courseQuestion.findMany({
+      where: {
+        course: {
+          instructorId,
+        },
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+        course: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+      },
+    });
+    return allQuestions;
+  }
+
   async create(
     userId: string,
     courseId: string,
