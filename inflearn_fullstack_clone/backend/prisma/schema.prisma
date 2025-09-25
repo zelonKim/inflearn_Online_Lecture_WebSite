@@ -35,6 +35,9 @@ model User {
   lectureActivities LectureActivity[]
   courseFavorites CourseFavorite[]
 
+  cartItems CartItem[]
+  orders Order[]
+
   @@map("users")
 }
 
@@ -116,6 +119,9 @@ model Course {
   lectureActivities LectureActivity[]
 
   instructor User @relation(fields: [instructorId], references:[id])
+
+  cartItems CartItem[]
+  orderItems OrderItem[]
 
   @@map("courses")
 }
@@ -269,3 +275,91 @@ model LectureActivity {
   @@unique([userId, courseId, lectureId])
   @@map("lecture_activities")
 }
+
+
+model CartItem {
+  id String @id @default(uuid())
+  userId String @map("user_id")
+  courseId String @map("course_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references:[id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references:[id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@map("cart_items")
+}
+
+
+model Order {
+  id String @id @default(uuid())
+  orderNumber String @unique @map("order_number")
+  userId String @map("user_id")
+  totalAmount Int @map("total_amount")
+  discountAmount Int @default(0) @map("discount_amount")
+  finalAmount Int @map("final_amount")
+  status String @default("PENDING")
+  customerName String? @map("customer_name")
+  customerEmail String? @map("customer_email")
+  customerPhone String? @map("customer_phone")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references:[id], onDelete: Cascade)
+
+  orderItems OrderItem[]
+  payments Payment[]
+
+  @@map("orders")
+}
+
+
+
+
+model OrderItem {
+  id String @id @default(uuid())
+  orderId String @map("order_id")
+  courseId String @map("course_id")
+  courseName String @map("course_name")
+  originalPrice Int @map("original_price")
+  discountPrice Int @map("discount_price")
+  finalPrice Int @map("final_price")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  order Order @relation(fields:[orderId], references: [id], onDelete: Cascade)
+  course Course @relation(fields:[courseId], references: [id], onDelete: Cascade)
+
+  @@map("order_items")
+}
+
+
+model Payment {
+  id String @id @default(uuid())
+  paymentId String @unique @map("payment_id")
+  orderId String @map("order_id")
+  transactionId String @map("transaction_id")
+  amount Int @map("amount")
+  currency String @default("KRW")
+  paymentMethod String @map("payment_method")
+  pgProvider String? @map("pg_provider")
+  status String @default("READY")
+  failureReason String? @map("failure_reason")
+  paidAt DateTime? @map("paid_at")
+  cancelledAt DateTime? @map("cancelled_at")
+
+  virtualAccountNumber String? @map("virtual_account_number")
+  virtualAccountBank String? @map("virtual_account_bank")
+  virtualAccountHolder String? @map("virtual_account_holder")
+  virtualAccountExpiry String? @map("virtual_account_expiry")
+
+  portoneData Json? @map("portone_data")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+

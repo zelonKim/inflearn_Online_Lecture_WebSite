@@ -1,34 +1,38 @@
 "use client";
 
-import { Course } from "@/generated/openapi-client";
-import { Heart, HeartIcon, ShoppingCart } from "lucide-react";
+import {
+  Course as CourseEntity,
+  CourseFavorite as CourseFavoriteEntity,
+} from "@/generated/openapi-client";
+import { HeartIcon, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { Router, useRouter } from "next/router";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import * as api from "@/lib/api";
+import { useRouter } from "next/navigation";
 import { getLevelText } from "@/lib/level";
-import { cn } from "@/lib/utils";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import * as api from "@/lib/api";
 import { User } from "next-auth";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface CourseCardProps {
-  user: User;
-  course: Course;
+  user?: User;
+  course: CourseEntity;
 }
 
 export default function CourseCard({ user, course }: CourseCardProps) {
   const router = useRouter();
-
+  const queryClient = useQueryClient();
   const getMyFavoritesQuery = useQuery({
     queryKey: ["my-favorites", user?.id],
     queryFn: async () => {
       if (user) {
-        api.getMyFavorites();
+        return api.getMyFavorites();
       }
+
       return null;
     },
   });
-
   const isFavorite = getMyFavoritesQuery.data?.data?.find(
     (fav) => fav.courseId === course.id
   );
@@ -66,12 +70,28 @@ export default function CourseCard({ user, course }: CourseCardProps) {
   const isFavoriteDisabled =
     addFavoriteMutation.isPending || removeFavoriteMutation.isPending;
 
+  const addToCartMutation = useMutation({
+    mutationFn: () => api.addToCart(course.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart-items"] });
+      toast.success(`"${course.title}"이(가) 장바구니에 담겼습니다.`);
+    },
+  });
+
   const handleCartClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    alert("구현 예정");
+
+    if (!user) {
+      alert("로그인 후 이용해주세요.");
+      return;
+    }
+
+    addToCartMutation.mutate();
   };
 
+
+  
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("ko-KR").format(price);
   };
@@ -108,11 +128,7 @@ export default function CourseCard({ user, course }: CourseCardProps) {
             <HeartIcon
               className={cn(
                 "size-4 transition-colors",
-                getMyFavoritesQuery.data?.data?.find(
-                  (fav) => fav.courseId === course.id
-                )
-                  ? "fill-red-500 text-red-500"
-                  : "text-gray-500",
+                isFavorite ? "fill-red-500 text-red-500" : "text-gray-500",
                 isFavoriteDisabled && "cursor-not-allowed"
               )}
             />
@@ -190,6 +206,7 @@ export default function CourseCard({ user, course }: CourseCardProps) {
             )}
           </div>
 
+          {/* 평점 정보 (임시로 하드코딩) */}
           <div className="flex items-center gap-1 text-xs">
             <span className="text-yellow-500">★</span>
             <span className="font-medium">4.8</span>
