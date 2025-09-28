@@ -51,8 +51,6 @@ export default function SiteHeader({
       )
       .slice(0, 3) ?? [];
 
-
-
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("ko-KR").format(price);
   };
@@ -264,6 +262,12 @@ export default function SiteHeader({
                 onClick={() => signOut()}
               >
                 <div className="font-semibold text-gray-800">로그아웃</div>
+              </button>
+              <button
+                className="w-full text-left px-4 py-3 hover:bg-gray-100 foucs:outline"
+                onClick={() => router.push("/my/courses")}
+              >
+                <div className="font-semibold text-gray-800">내 학습</div>
               </button>
             </PopoverContent>
           </Popover>

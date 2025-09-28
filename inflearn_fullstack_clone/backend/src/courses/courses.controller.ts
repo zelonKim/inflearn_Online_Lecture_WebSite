@@ -23,7 +23,6 @@ import {
 import { Request } from 'express';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
-import { Prisma } from '@prisma/client';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { Course as CourseEntity } from 'src/_gen/prisma-class/course';
 import { SearchCourseResponseDto } from './dto/search-response.dto';
@@ -55,7 +54,7 @@ export class CoursesController {
     return this.coursesService.create(req.user.sub, createCourseDto);
   }
 
-  @Get()
+  @Get('instructor')
   @UseGuards(AccessTokenGuard)
   @ApiQuery({ name: 'skip', required: false })
   @ApiQuery({ name: 'take', required: false })
@@ -64,7 +63,7 @@ export class CoursesController {
     type: CourseEntity,
     isArray: true,
   })
-  findAllMyCourses(
+  findAllInstructorCourses(
     @Req() req: Request,
     @Query('skip') skip?: string,
     @Query('take') take?: string,
@@ -79,6 +78,17 @@ export class CoursesController {
         createdAt: 'desc',
       },
     });
+  }
+
+  @Get('my')
+  @UseGuards(AccessTokenGuard)
+  @ApiOkResponse({
+    description: '코스 목록',
+    type: CourseEntity,
+    isArray: true,
+  })
+  findAllMyCourses(@Req() req: Request) {
+    return this.coursesService.findAllMyCourses(req.user.sub);
   }
 
   @Get(':id')

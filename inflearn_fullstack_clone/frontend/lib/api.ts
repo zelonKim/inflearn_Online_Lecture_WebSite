@@ -15,6 +15,7 @@ import {
   coursesControllerCreateReview,
   coursesControllerDeleteReview,
   coursesControllerEnrollCourse,
+  coursesControllerFindAllInstructorCourses,
   coursesControllerFindAllMyCourses,
   coursesControllerFindOne,
   coursesControllerGetCourseReviews,
@@ -36,6 +37,7 @@ import {
   lecturesControllerUpdate,
   lecturesControllerUpdateLectureActivity,
   mediaControllerUploadMedia,
+  paymentsControllerVerifyPayment,
   questionsControllerCreate,
   questionsControllerFindAll,
   questionsControllerFindAllByInstructorId,
@@ -55,6 +57,7 @@ import {
   UpdateUserDto,
   usersControllerGetProfile,
   usersControllerUpdateProfile,
+  VerifyPaymentDto,
 } from "@/generated/openapi-client";
 
 export const getAllCategories = async () => {
@@ -67,13 +70,24 @@ export const getAllCategories = async () => {
 };
 
 export const getAllInstructorCourses = async () => {
-  const { data, error } = await coursesControllerFindAllMyCourses();
+  const { data, error } = await coursesControllerFindAllInstructorCourses();
 
   return {
     data,
     error,
   };
 };
+
+
+export const getAllMyCourses = async () => {
+  const {data, error} = await coursesControllerFindAllMyCourses()
+
+  return {
+    data, error
+  }
+}
+
+
 
 export const getCourseById = async (id: string) => {
   const { data, error } = await coursesControllerFindOne({
@@ -152,6 +166,7 @@ export const createLecture = async (sectionId: string, title: string) => {
 
 export const deleteLecture = async (lectureId: string) => {
   const { data, error } = await lecturesControllerDelete({
+    body:{},
     path: {
       lectureId,
     },
@@ -511,5 +526,13 @@ export const removeFromCart = async (courseId: string) => {
 export const clearCart = async () => {
   const {data, error} = await cartsControllerClearCart()
 
+  return {data, error}
+}
+
+
+export const verifyPayment = async (verifyPaymentDto: VerifyPaymentDto) => {
+  const {data, error} = await paymentsControllerVerifyPayment({
+    body: verifyPaymentDto,
+  })
   return {data, error}
 }

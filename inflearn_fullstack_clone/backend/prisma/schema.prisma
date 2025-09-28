@@ -363,3 +363,14 @@ model Payment {
   @@map("payments")
 }
 
+model DailyPaymentStats{
+  id String @id @default(uuid())
+  date DateTime @unique @db.Date
+  totalPayment Int @default(0) @map("total_payments")
+  totalAmount Int @default(0) @map("total_amount")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("daily_paymnet_stats")
+}
+

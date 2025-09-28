@@ -1,7 +1,8 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseInterceptors } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CourseCategory as CourseCategoryEntity } from 'src/_gen/prisma-class/course_category';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 
 @ApiTags('카테고리')
 @Controller('categories')
@@ -15,6 +16,8 @@ export class CategoriesController {
     type: CourseCategoryEntity,
     isArray: true,
   })
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(10 * 1000)
   findAll() {
     return this.categoriesService.findAll();
   }

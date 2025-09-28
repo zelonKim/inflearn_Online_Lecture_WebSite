@@ -13,6 +13,7 @@
     "@auth/prisma-adapter": "^2.10.0",
     "@ckeditor/ckeditor5-react": "^11.0.0",
     "@hookform/resolvers": "^5.2.1",
+    "@portone/browser-sdk": "^0.0.23",
     "@prisma/client": "^6.14.0",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
