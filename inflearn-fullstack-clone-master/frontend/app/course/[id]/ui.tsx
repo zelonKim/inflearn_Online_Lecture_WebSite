@@ -23,6 +23,7 @@ import {
   Loader2,
   PencilIcon,
   Trash2Icon,
+  Loader2Icon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -82,7 +83,7 @@ const mockInstructorStats = {
 function StarRating({ rating }: { rating: number }) {
   const rounded = Math.round(rating);
   return (
-    <div className="flex items-center gap-0.5">
+    <div className="flex items-center gap-0.5 ">
       {Array.from({ length: 5 }).map((_, i) => (
         <StarIcon
           key={i}
@@ -172,10 +173,13 @@ function ReviewModal({
         content,
         rating,
       }),
-    onSuccess: () => {
-      toast.success("수강평이 등록되었습니다.");
+    onSuccess: (res) => {
+      toast.success("리뷰가 등록되었습니다.");
       setShowReviewModal(false);
       window.location.reload();
+    },
+    onError: (err) => {
+      toast.error(err.message);
     },
   });
 
@@ -186,7 +190,7 @@ function ReviewModal({
         rating,
       }),
     onSuccess: () => {
-      toast.success("수강평이 수정되었습니다.");
+      toast.success("리뷰가 수정되었습니다.");
       setShowReviewModal(false);
       window.location.reload();
     },
@@ -198,7 +202,7 @@ function ReviewModal({
       return;
     }
     if (!content.trim()) {
-      alert("수강평을 작성해주세요.");
+      alert("리뷰를 작성해주세요.");
       return;
     }
 
@@ -217,9 +221,7 @@ function ReviewModal({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="text-center text-lg font-semibold">
-            {editingReview
-              ? "수강평 수정하기"
-              : "힘이 되는 수강평을 남겨주세요!"}
+            {editingReview ? "리뷰 수정하기" : "힘이 되는 리뷰를 남겨주세요!"}
           </DialogTitle>
         </DialogHeader>
 
@@ -231,7 +233,7 @@ function ReviewModal({
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder="수강평을 작성해보세요!"
+            placeholder="리뷰를 작성해보세요!"
             className="w-full h-32 p-3 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
           />
         </div>
@@ -275,11 +277,11 @@ function DeleteConfirmDialog({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle className="text-center">수강평 삭제</DialogTitle>
+          <DialogTitle className="text-center">리뷰 삭제</DialogTitle>
           <DialogDescription className="text-center">
-            정말로 이 수강평을 삭제하시겠습니까?
+            정말로 이 리뷰를 삭제하시겠습니까?
             <br />
-            삭제된 수강평은 복구할 수 없습니다.
+            삭제된 리뷰는 복구할 수 없습니다.
           </DialogDescription>
         </DialogHeader>
 
@@ -310,7 +312,7 @@ function DeleteConfirmDialog({
 
 function Header({ course }: { course: CourseDetailDto }) {
   return (
-    <header className="relative text-white rounded-md p-8 flex flex-col-reverse md:flex-row md:items-center gap-6">
+    <header className="relative text-white rounded-md p-8 flex flex-col-reverse md:flex-row md:items-center gap-6 -z-10">
       <div className="absolute bg-[#0F1415] top-0 bottom-0 w-screen left-1/2 -translate-x-1/2 -z-10"></div>
       {/* Left */}
       <div className="flex-1">
@@ -329,7 +331,7 @@ function Header({ course }: { course: CourseDetailDto }) {
           <StarRating rating={course.averageRating} />
           <span className="font-medium">{course.averageRating.toFixed(1)}</span>
           <span className="text-muted-foreground">
-            ({course.totalReviews}개 수강평)
+            ({course.totalReviews}개 리뷰)
           </span>
           <span className="hidden md:inline">·</span>
           <span>수강생 {course.totalEnrollments.toLocaleString()}명</span>
@@ -380,7 +382,7 @@ function LatestReviews({ reviews }: { reviews: CourseReviewEntity[] }) {
       <h3 className="text-xl font-semibold mb-4">최근 리뷰</h3>
       <div
         className={cn(
-          "grid grid-cols-2 gap-4",
+          "grid grid-cols-2 gap-4 ",
           latest.length > 2 && "grid-rows-2"
         )}
       >
@@ -390,7 +392,7 @@ function LatestReviews({ reviews }: { reviews: CourseReviewEntity[] }) {
             <div
               key={r.id}
               style={{ gridColumnStart: col, gridRowStart: row }}
-              className="border rounded-md p-4 flex flex-col gap-2 bg-white"
+              className="border-1 rounded-lg p-4 flex flex-col gap-2 bg-white"
             >
               <div className="flex items-center gap-2">
                 {r.user?.image && (
@@ -405,7 +407,9 @@ function LatestReviews({ reviews }: { reviews: CourseReviewEntity[] }) {
                 <span className="text-sm font-medium">
                   {r.user?.name ?? "익명"}
                 </span>
-                <StarRating rating={r.rating} />
+                <span className="">
+                  <StarRating rating={r.rating} />
+                </span>
               </div>
               <p className="text-sm leading-relaxed whitespace-pre-wrap flex-1">
                 {r.content}
@@ -421,8 +425,8 @@ function LatestReviews({ reviews }: { reviews: CourseReviewEntity[] }) {
 function Introduction({ course }: { course: CourseDetailDto }) {
   return (
     <section id="introduction" className="">
-      <h2 className="text-2xl font-bold mb-6">강의 소개</h2>
       <LatestReviews reviews={course.reviews} />
+      <h2 className="text-2xl font-bold mb-6 mt-14">강의 소개</h2>
       {course.description && (
         <div
           className="prose max-w-none"
@@ -486,7 +490,7 @@ function Curriculum({
   sections: SectionEntity[];
 }) {
   return (
-    <section id="curriculum" className="mt-12">
+    <section id="curriculum" className="">
       <h2 className="text-2xl font-bold mb-6">커리큘럼</h2>
       <div className="border rounded-md bg-[#F8F9FA] overflow-hidden">
         <Accordion type="multiple" className="w-full">
@@ -598,13 +602,13 @@ function ReviewsSection({ courseId, user }: { courseId: string; user?: User }) {
   const deleteReviewMutation = useMutation({
     mutationFn: () => api.deleteReview(deletingReviewId!),
     onSuccess: () => {
-      toast.success("수강평이 삭제되었습니다.");
+      toast.success("리뷰가 삭제되었습니다.");
       setShowDeleteDialog(false);
       setDeletingReviewId(null);
       window.location.reload();
     },
     onError: () => {
-      toast.error("수강평 삭제에 실패했습니다.");
+      toast.error("리뷰 삭제에 실패했습니다.");
     },
   });
 
@@ -618,20 +622,20 @@ function ReviewsSection({ courseId, user }: { courseId: string; user?: User }) {
   };
 
   return (
-    <section id="reviews" className="mt-12">
+    <section id="reviews" className="">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">수강평</h2>
+        <h2 className="text-2xl font-bold">수강생 리뷰</h2>
         {user && !myReviewExists && (
           <button
             onClick={() => setShowReviewModal(true)}
             className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md transition-colors"
           >
-            수강평 남기기
+            리뷰 남기기
           </button>
         )}
       </div>
 
-      <div className="space-y-8">
+      <div className="space-y-8 ">
         {totalReviews.map((r) => (
           <div key={r.id} className="space-y-4">
             <div className="flex items-center justify-between">
@@ -678,7 +682,7 @@ function ReviewsSection({ courseId, user }: { courseId: string; user?: User }) {
             </p>
             {r.instructorReply && (
               <div className="ml-10 border-l-2 pl-4 border-primary">
-                <p className="font-medium mb-1 text-primary">지식공유자 답변</p>
+                <p className="font-medium mb-1 text-primary">강사 답변</p>
                 <p className="text-sm whitespace-pre-wrap leading-relaxed">
                   {r.instructorReply}
                 </p>
@@ -700,7 +704,7 @@ function ReviewsSection({ courseId, user }: { courseId: string; user?: User }) {
                 : "bg-white text-gray-700 hover:bg-gray-50"
             )}
           >
-            {isLoading ? "로딩 중..." : "더보기"}
+            {isLoading ? <Loader2 className="size-3 animate-spin" /> : "더보기"}
           </button>
         </div>
       )}
@@ -729,9 +733,8 @@ function ReviewsSection({ courseId, user }: { courseId: string; user?: User }) {
 function InstructorBio({ instructor }: { instructor: UserEntity }) {
   return (
     <>
-      <hr className="border-t border-gray-200 my-12" />
       <section id="instructor" className="">
-        <h2 className="text-2xl font-bold mb-6">지식공유자 소개</h2>
+        <h2 className="text-2xl font-bold mb-6">강사 소개</h2>
         <div className="flex gap-4">
           {instructor.image && (
             <Image
@@ -1072,10 +1075,13 @@ export default function CourseDetailUI({
 
       <div className="mt-12 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-10">
         {/* Main content */}
-        <div className="max-w-3xl">
+        <div className="max-w-3xl flex flex-col">
           <Introduction course={course} />
-          <InstructorBio instructor={course.instructor} />
+          <hr className="border-t border-gray-200 my-14" />
           <Curriculum courseId={course.id} sections={course.sections} />
+          <hr className="border-t border-gray-200 my-14" />
+          <InstructorBio instructor={course.instructor} />
+          <hr className="border-t border-gray-200 my-14" />
           <ReviewsSection courseId={course.id} user={user} />
         </div>
 

@@ -2,6 +2,7 @@
 
 import {
   AddToCartDto,
+  CourseDetailDto,
   Course as CourseEntity,
   CourseFavorite as CourseFavoriteEntity,
 } from "@/generated/openapi-client";
@@ -24,6 +25,12 @@ interface CourseCardProps {
 export default function CourseCard({ user, course }: CourseCardProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
+
+  const getCourseQuery = useQuery({
+    queryKey: ["course", course.id],
+    queryFn: async () => await api.getCourseById(course.id),
+    select: (data) => data.data,
+  });
 
   const getMyFavoritesQuery = useQuery({
     queryKey: ["my-favorites", user?.id],
@@ -110,7 +117,7 @@ export default function CourseCard({ user, course }: CourseCardProps) {
 
   return (
     <div
-      className="group relative cursor-pointer overflow-hidden bg-white transition-all duration-300"
+      className="group hover:scale-105 hover:shadow-lg hover:rounded-md  relative cursor-pointer overflow-hidden bg-white transition-all duration-300"
       onClick={() => router.push(`/course/${course.id}`)}
     >
       {/* 썸네일 이미지 */}
@@ -123,11 +130,11 @@ export default function CourseCard({ user, course }: CourseCardProps) {
         />
 
         {/* 호버 시 보이는 액션 버튼들 */}
-        <div className="absolute right-2 top-2 flex gap-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+        <div className="absolute right-2 top-2 flex gap-2 opacity-0 transition-opacity duration-300  group-hover:opacity-100">
           <Button
             size="sm"
             variant="secondary"
-            className="h-8 w-8 p-0"
+            className=" h-8 w-8 p-0 hover:bg-red-50/90 "
             onClick={handleFavoriteClick}
           >
             <HeartIcon
@@ -142,7 +149,7 @@ export default function CourseCard({ user, course }: CourseCardProps) {
           <Button
             size="sm"
             variant="secondary"
-            className="h-8 w-8 p-0"
+            className="h-8 w-8 p-0 hover:bg-green-50/90"
             onClick={handleCartClick}
           >
             <ShoppingCart className="h-4 w-4" />
@@ -151,7 +158,7 @@ export default function CourseCard({ user, course }: CourseCardProps) {
       </div>
 
       {/* 강의 정보 */}
-      <div className="py-2">
+      <div className="p-2">
         <h3
           className="mb-2 text-md font-semibold text-gray-900 overflow-hidden"
           style={{
@@ -177,31 +184,45 @@ export default function CourseCard({ user, course }: CourseCardProps) {
         )}
 
         {/* 레벨 및 강사 정보 */}
-        <div className="mb-3 flex items-center gap-2 text-xs text-gray-500">
-          <span className="rounded bg-gray-100 px-2 py-1">
-            {getLevelText(course.level)}
-          </span>
-          <span>{course.instructor?.name || "강사명"}</span>
+        <div className="flex flex-row justify-between mb-3">
+          <div className="flex items-center gap-2 text-xs text-gray-500">
+            <span className="rounded bg-gray-100 px-2 py-1">
+              {getLevelText(course.level)}
+            </span>
+            <span>{course.instructor?.name || "강사명"}</span>
+          </div>
+
+          <div className=" flex items-center gap-1 text-xs">
+            <span className="text-yellow-500 group-hover:scale-110">★</span>
+            <span className="font-medium">
+              {getCourseQuery?.data?.averageRating?.toFixed(1) || 0.0}
+            </span>
+            <span className="text-gray-400">
+              ({getCourseQuery?.data?.totalReviews || 0})
+            </span>
+          </div>
         </div>
 
         {/* 가격 정보 */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-row items-center justify-between">
           <div className="flex flex-col">
             {course.discountPrice && course.discountPrice < course.price ? (
               <>
-                <span className="text-xs text-gray-400 line-through">
-                  ₩{formatPrice(course.price)}
-                </span>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-red-500 bg-red-50 px-1.5 py-0.5 rounded">
+                <div className="flex flex-row gap-2">
+                  <span className="text-xs text-gray-400 line-through">
+                    ₩{formatPrice(course.price)}
+                  </span>
+                  <div className="flex items-center gap-2 ">
+                    <span className="text-sm font-bold text-gray-900">
+                      ₩{formatPrice(course.discountPrice)}
+                    </span>
+                  </div>
+                  <span className="group-hover:animate-bounce text-xs font-bold text-red-500 bg-red-50 mx-2 px-1.5 py-0.5 rounded-sm">
                     {calculateDiscountPercentage(
                       course.price,
                       course.discountPrice
                     )}
                     % 할인
-                  </span>
-                  <span className="text-sm font-bold text-gray-900">
-                    ₩{formatPrice(course.discountPrice)}
                   </span>
                 </div>
               </>
@@ -210,13 +231,6 @@ export default function CourseCard({ user, course }: CourseCardProps) {
                 ₩{formatPrice(course.price)}
               </span>
             )}
-          </div>
-
-          {/* 평점 정보 (임시로 하드코딩) */}
-          <div className="flex items-center gap-1 text-xs">
-            <span className="text-yellow-500">★</span>
-            <span className="font-medium">4.8</span>
-            <span className="text-gray-400">(213)</span>
           </div>
         </div>
       </div>

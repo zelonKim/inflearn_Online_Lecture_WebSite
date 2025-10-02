@@ -1,7 +1,7 @@
 "use client";
 
 import { CourseCategory, User } from "@/generated/openapi-client";
-import { Layers, Search, ShoppingCart } from "lucide-react";
+import { Layers, Loader2, Search, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -65,13 +65,14 @@ export default function SiteHeader({
   if (!isSiteHeaderNeeded) return null;
 
   if (cartItemsQuery.isLoading) {
-    return <div>로딩중...</div>;
+    return <Loader2 className="size-3 animate-spin" />;
   }
 
   return (
-    <header className="relative site-header w-full bg-white">
+    <header className="sticky top-0 z-10 site-header w-full px-12 bg-white pt-2 ">
       {/* 상단 헤더 */}
-      <div className="header-top flex items-center justify-between px-8 py-3 gap-4">
+
+      <div className=" header-top flex items-center justify-between px-8 pb-1 gap-4">
         {/* 로고 */}
         <div className="logo min-w-[120px]">
           <Link href="/">
@@ -105,7 +106,7 @@ export default function SiteHeader({
             <Input
               type="text"
               placeholder="나의 진짜 성장을 도와줄 실무 강의를 찾아보세요"
-              className="w-full bg-gray-50 border-gray-200 focus-visible:ring-[#1dc078] pr-10"
+              className="w-full bg-gray-50 border-gray-300 hover:shadow-sm  hover:border-green-400 border-1 focus-visible:ring-0 focus-visible:border-green-400 focus-visible:border-2  focus:bg-green-50 pr-10"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => {
@@ -131,105 +132,110 @@ export default function SiteHeader({
           </div>
         </div>
         {/* 지식공유자 버튼 */}
-        <Link href="/instructor">
-          <Button
-            variant="outline"
-            className="font-semibold border-gray-200 hover:border-[#1dc078] hover:text-[#1dc078]"
-          >
-            나의 채널
-          </Button>
-        </Link>
 
-        {/* 장바구니 아이콘 + Popover */}
-        <Popover>
-          <PopoverTrigger asChild>
-            <button className="relative p-2 hover:bg-gray-100 rounded-full transition-colors">
-              <ShoppingCart className="size-5 text-gray-600" />
-              {cartItemsQuery?.data?.data?.totalCount ??
-                (0 > 0 && (
-                  <Badge
-                    variant="destructive"
-                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs p-0 bg-red-500"
-                  >
-                    {cartItemsQuery?.data?.data?.totalCount}
-                  </Badge>
-                ))}
-            </button>
-          </PopoverTrigger>
-          <PopoverContent align="end" className="w-80 p-0">
-            <div className="p-4 border-b border-gray-100">
-              <h3 className="font-semibold text-gray-800">수강바구니</h3>
-            </div>
+        {session && (
+          <Link href="/instructor">
+            <Button
+              variant="outline"
+              className="font-semibold shadow-sm border-gray-300 hover:border-green-400 hover:ring-1 hover:ring-green-400 hover:shadow-md hover:text-green-600 hover:!bg-green-50"
+            >
+              나의 채널
+            </Button>
+          </Link>
+        )}
 
-            {cartItemsQuery?.data?.data?.totalCount === 0 ? (
-              <div className="p-4 text-center text-gray-500">
-                장바구니가 비어있습니다.
-              </div>
-            ) : (
-              <>
-                <div className="max-h-64 overflow-y-auto">
-                  {recentCartItems.map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex items-center gap-3 p-3 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-b-0"
+        {session && (
+          <Popover>
+            <PopoverTrigger asChild>
+              <button className="relative p-2 hover:bg-green-50 hover:shadow-md hover:border-green-300 hover:shadow-gray-200 rounded-full transition-colors">
+                <ShoppingCart className="size-5 text-gray-600 " />
+                {cartItemsQuery?.data?.data?.totalCount ??
+                  (0 > 0 && (
+                    <Badge
+                      variant="destructive"
+                      className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs p-0 bg-red-500"
                     >
-                      <div className="relative w-12 h-8 flex-shrink-0">
-                        {item.course.thumbnailUrl && (
-                          <Image
-                            src={item.course.thumbnailUrl}
-                            alt={item.course.title}
-                            fill
-                            className="rounded object-cover"
-                          />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-medium text-gray-900 truncate">
-                          {item.course.title}
-                        </h4>
-                        <p className="text-xs text-gray-500">
-                          {item.course.instructor.name}
-                        </p>
-                        <div className="flex items-center gap-2 mt-1">
-                          {item.course.discountPrice &&
-                          item.course.discountPrice < item.course.price ? (
-                            <>
-                              <span className="text-xs font-semibold text-gray-900">
-                                ₩{formatPrice(item.course.discountPrice)}
-                              </span>
-                              <span className="text-xs text-gray-400 line-through">
-                                ₩{formatPrice(item.course.price)}
-                              </span>
-                            </>
-                          ) : (
-                            <span className="text-xs font-semibold text-gray-900">
-                              ₩{formatPrice(item.course.price)}
-                            </span>
+                      {cartItemsQuery?.data?.data?.totalCount}
+                    </Badge>
+                  ))}
+              </button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-80 p-0">
+              <div className="p-4 border-b border-gray-100">
+                <h3 className="font-semibold text-gray-800">수강바구니</h3>
+              </div>
+
+              {cartItemsQuery?.data?.data?.totalCount === 0 ? (
+                <div className="p-4 text-center text-gray-500">
+                  장바구니가 비어있습니다.
+                </div>
+              ) : (
+                <>
+                  <div className="max-h-64 overflow-y-auto">
+                    {recentCartItems.map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex items-center gap-3 p-3 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-b-0"
+                      >
+                        <div className="relative w-12 h-8 flex-shrink-0">
+                          {item.course.thumbnailUrl && (
+                            <Image
+                              src={item.course.thumbnailUrl}
+                              alt={item.course.title}
+                              fill
+                              className="rounded object-cover"
+                            />
                           )}
                         </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-medium text-gray-900 truncate">
+                            {item.course.title}
+                          </h4>
+                          <p className="text-xs text-gray-500">
+                            {item.course.instructor.name}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            {item.course.discountPrice &&
+                            item.course.discountPrice < item.course.price ? (
+                              <>
+                                <span className="text-xs font-semibold text-gray-900">
+                                  ₩{formatPrice(item.course.discountPrice)}
+                                </span>
+                                <span className="text-xs text-gray-400 line-through">
+                                  ₩{formatPrice(item.course.price)}
+                                </span>
+                              </>
+                            ) : (
+                              <span className="text-xs font-semibold text-gray-900">
+                                ₩{formatPrice(item.course.price)}
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
 
-                <div className="p-3 bg-gray-50">
-                  <Button
-                    onClick={() => router.push("/carts")}
-                    className="w-full bg-[#1dc078] hover:bg-[#1dc078]/90 hover:ring-green-300 ring-1 text-white font-medium"
-                  >
-                    수강바구니에서 전체보기
-                  </Button>
-                </div>
-              </>
-            )}
-          </PopoverContent>
-        </Popover>
+                  <div className="p-3 bg-gray-50">
+                    <Button
+                      onClick={() => router.push("/carts")}
+                      className="w-full bg-[#1dc078] hover:bg-[#1dc078]/90 hover:ring-green-300 ring-1 text-white font-medium"
+                    >
+                      수강바구니에서 전체보기
+                    </Button>
+                  </div>
+                </>
+              )}
+            </PopoverContent>
+          </Popover>
+        )}
 
         {/* Avatar + Popover or 로그인 버튼 */}
+
         {session ? (
           <Popover>
             <PopoverTrigger asChild>
-              <div className="ml-2 cursor-pointer">
+              <div className="ml-2 cursor-pointer ">
                 <Avatar>
                   {userProfileQuery.data?.image ? (
                     <img
@@ -281,20 +287,31 @@ export default function SiteHeader({
             </PopoverContent>
           </Popover>
         ) : (
-          <Link href="/signin">
-            <Button
-              variant="outline"
-              className="font-semibold border-gray-200 hover:border-[#1dc078] hover:text-[#1dc078] ml-2"
-            >
-              로그인
-            </Button>
-          </Link>
+          <div>
+            <Link href="/signin">
+              <Button
+                variant="outline"
+                className="font-semibold shadow-sm border-gray-200 hover:bg-green-50 hover:border-[#1dc078] hover:text-[#1dc078] ml-2"
+              >
+                로그인
+              </Button>
+            </Link>
+            <Link href="/signup">
+              <Button
+                variant="outline"
+                className="font-semibold shadow-sm border-gray-200 hover:bg-green-50 hover:border-[#1dc078] hover:text-[#1dc078] ml-3"
+              >
+                회원가입
+              </Button>
+            </Link>
+          </div>
         )}
       </div>
+
       {/* 하단 카테고리 */}
-      <div className="header-bottom bg-white px-8">
+      <div className="header-bottom bg-white px-8 pb-1">
         {isCategoryNeeded && (
-          <nav className="category-nav flex justify-between gap-6 py-4 overflow-x-auto scrollbar-none">
+          <nav className="  category-nav flex justify-between gap-4 py-4 overflow-x-auto scrollbar-none">
             {categories.map((category) => (
               <Link key={category.id} href={`/courses/${category.slug}`}>
                 <div className="category-item flex flex-col items-center min-w-[72px] text-gray-700 hover:text-[#1dc078] cursor-pointer transition-colors">
@@ -315,7 +332,7 @@ export default function SiteHeader({
           </nav>
         )}
       </div>
-      <div className="border-b absolute bottom-0 w-screen left-1/2 -translate-x-1/2"></div>
+      <div className=" border-b shadow-sm border-gray-200 absolute bottom-0 w-screen left-1/2 -translate-x-1/2"></div>
     </header>
   );
 }

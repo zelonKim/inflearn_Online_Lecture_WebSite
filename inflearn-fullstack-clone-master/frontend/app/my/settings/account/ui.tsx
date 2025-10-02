@@ -115,14 +115,14 @@ export default function UI({ profile }: { profile: User }) {
                   className="w-28 h-28 object-cover rounded-full mx-auto mb-2 border-2 group-hover:border-green-300 "
                 />
               ) : (
-                <ImageIcon className="w-10 h-10 text-gray-400 mb-2 border-2 group-hover:border-green-300" />
+                <ImageIcon className="w-25 h-25 text-gray-400 rounded-full p-3  border-2 group-hover:border-green-300" />
               )}
-              <span className="text-sm text-gray-600 ">
+              <span className="text-sm text-gray-600 mt-2">
                 {image
-                  ? "클릭하여 변경"
+                  ? "클릭하여 변경가능"
                   : isDragActive
                   ? "이미지를 여기에 놓으세요"
-                  : "클릭하거나 이미지를 드래그하여 업로드"}
+                  : "클릭하거나 드래그하여 이미지 업로드"}
               </span>
             </div>
           </div>

@@ -548,20 +548,20 @@ export class CoursesService {
       throw new NotFoundException('코스를 찾을 수 없습니다.');
     }
 
-    const enrollment = await this.prisma.courseEnrollment.findUnique({
-      where: {
-        userId_courseId: {
-          userId,
-          courseId,
-        },
-      },
-    });
+    // const enrollment = await this.prisma.courseEnrollment.findUnique({
+    //   where: {
+    //     userId_courseId: {
+    //       userId,
+    //       courseId,
+    //     },
+    //   },
+    // });
 
-    if (!enrollment) {
-      throw new UnauthorizedException(
-        '수강신청한 강의만 리뷰를 작성하실 수 있습니다.',
-      );
-    }
+    // if (!enrollment) {
+    //   throw new UnauthorizedException(
+    //     '수강신청한 강의만 리뷰를 작성하실 수 있습니다.',
+    //   );
+    // }
 
     const existingReview = await this.prisma.courseReview.findFirst({
       where: {
@@ -594,6 +594,9 @@ export class CoursesService {
     return review as unknown as CourseReviewEntity;
   }
 
+
+
+  
   async updateReview(
     reviewId: string,
     userId: string,

@@ -4,6 +4,7 @@ import "./globals.css";
 import Providers from "@/config/providers";
 import * as api from "@/lib/api";
 import SiteHeader from "@/components/site-header";
+import SiteFooter from "@/components/site-footer";
 import { Toaster } from "sonner";
 import { auth } from "@/auth";
 import { useQuery } from "@tanstack/react-query";
@@ -37,11 +38,14 @@ export default async function RootLayout({
     <html lang="en">
       <body
         suppressHydrationWarning
-        className={`${geistSans.variable} ${geistMono.variable} antialiased max-w-7xl mx-auto`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased `}
       >
         <Providers>
           <SiteHeader session={session} categories={categories.data ?? []} />
-          <main>{children}</main>
+          <div className=" max-w-7xl mx-auto">
+            <main>{children}</main>
+          </div>
+          <SiteFooter />
         </Providers>
         <Toaster />
       </body>

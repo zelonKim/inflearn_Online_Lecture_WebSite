@@ -5,9 +5,11 @@ import { prisma } from "@/prisma";
 import { redirect } from "next/navigation";
 
 export async function signUp({
+  name,
   email,
   password,
 }: {
+  name: string;
   email: string;
   password: string;
 }) {
@@ -24,6 +26,7 @@ export async function signUp({
 
     const user = await prisma.user.create({
       data: {
+        name,
         email,
         hashedPassword: saltAndHashPassword(password),
       },
