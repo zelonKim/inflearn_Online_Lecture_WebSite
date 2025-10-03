@@ -7,7 +7,6 @@ import SiteHeader from "@/components/site-header";
 import SiteFooter from "@/components/site-footer";
 import { Toaster } from "sonner";
 import { auth } from "@/auth";
-import { useQuery } from "@tanstack/react-query";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

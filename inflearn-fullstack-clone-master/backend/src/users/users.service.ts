@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { InstructorStatsDto } from './dto/instructor-stats.dto';
 
 @Injectable()
 export class UsersService {
@@ -29,5 +30,46 @@ export class UsersService {
         hashedPassword: true,
       },
     });
+  }
+
+  async getInstructorStats(userId: string): Promise<InstructorStatsDto> {
+    const coursesCount = await this.prisma.course.count({
+      where: {
+        instructorId: userId,
+      },
+    });
+
+    const reviewsCount = await this.prisma.courseReview.count({
+      where: {
+        course: {
+          instructorId: userId,
+        },
+      },
+    });
+
+    const questionsCount = await this.prisma.courseQuestion.count({
+      where: {
+        course: {
+          instructorId: userId,
+        },
+      },
+    });
+
+    const commentsCount = await this.prisma.courseComment.count({
+      where: {
+        question: {
+          course: {
+            instructorId: userId,
+          },
+        },
+      },
+    });
+
+    return {
+      coursesCount,
+      reviewsCount,
+      questionsCount,
+      commentsCount,
+    };
   }
 }

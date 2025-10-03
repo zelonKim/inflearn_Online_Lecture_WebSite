@@ -86,7 +86,7 @@ export default function SiteHeader({
           </Link>
         </div>
         {/* 네비게이션 */}
-        <nav className="main-nav flex gap-6 text-base font-bold text-gray-700">
+        <nav className="hidden lg:block lg:flex  main-nav  gap-6 text-base font-bold text-gray-700">
           <Link href="#" className="hover:text-[#1dc078] transition-colors">
             강의
           </Link>

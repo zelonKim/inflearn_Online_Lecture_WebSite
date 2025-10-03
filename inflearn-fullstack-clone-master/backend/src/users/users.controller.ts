@@ -5,6 +5,7 @@ import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
 import { User as UserEntity } from 'src/_gen/prisma-class/user';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { InstructorStatsDto } from './dto/instructor-stats.dto';
 
 @Controller('users')
 export class UsersController {
@@ -30,5 +31,16 @@ export class UsersController {
   })
   updateProfile(@Req() req: Request, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.updateProfile(req.user.sub, updateUserDto);
+  }
+
+  @Get('instructor-stats')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOkResponse({
+    description: '강사 통계 조회',
+    type: InstructorStatsDto,
+  })
+  getInstructorStats(@Req() req: Request) {
+    return this.usersService.getInstructorStats(req.user.sub);
   }
 }

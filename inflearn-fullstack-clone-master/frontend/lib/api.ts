@@ -58,6 +58,7 @@ import {
   UpdateReviewDto,
   UpdateUserDto,
   usersControllerGetProfile,
+  usersControllerGetInstructorStats,
   usersControllerUpdateProfile,
   VerifyPaymentDto,
 } from "@/generated/openapi-client";
@@ -231,6 +232,11 @@ export const uploadMedia = async (file: File) => {
 
 export const getProfile = async () => {
   const { data, error } = await usersControllerGetProfile();
+  return { data, error };
+};
+
+export const getInstructorStats = async () => {
+  const { data, error } = await usersControllerGetInstructorStats();
   return { data, error };
 };
 
@@ -546,8 +552,6 @@ export const verifyPayment = async (verifyPaymentDto: VerifyPaymentDto) => {
 
   return { data, error };
 };
-
-
 
 export const deleteCourse = async (courseId: string) => {
   const { data, error } = await coursesControllerDelete({

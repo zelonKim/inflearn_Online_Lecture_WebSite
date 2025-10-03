@@ -117,7 +117,8 @@ export default function CourseCard({ user, course }: CourseCardProps) {
 
   return (
     <div
-      className="group hover:scale-105 hover:shadow-lg hover:rounded-md  relative cursor-pointer overflow-hidden bg-white transition-all duration-300"
+      className="pt-1 group  hover:scale-105 hover:shadow-xl
+        ring-1 ring-gray-100 hover:rounded-lg  relative cursor-pointer overflow-hidden bg-white transition-all duration-300 shadow-md rounded-md"
       onClick={() => router.push(`/course/${course.id}`)}
     >
       {/* 썸네일 이미지 */}

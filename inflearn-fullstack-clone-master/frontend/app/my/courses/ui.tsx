@@ -17,6 +17,7 @@ import {
 import { Search, Filter, BookOpen, User, Star, Award } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Progress } from "@/components/ui/progress";
+import { getLevelText } from "@/lib/level";
 
 interface MyCoursesUIProps {
   courses: Course[];
@@ -91,11 +92,11 @@ export default function MyCoursesUI({ courses }: MyCoursesUIProps) {
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {sortedCourses.map((course) => (
             <div
               key={course.id}
-              className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow cursor-pointer"
+              className="bg-white rounded-lg shadow-sm border hover:shadow-lg hover:scale-105 transition-shadow cursor-pointer"
               onClick={() => handleCourseClick(course.id)}
             >
               {/* 썸네일 */}
@@ -122,7 +123,7 @@ export default function MyCoursesUI({ courses }: MyCoursesUIProps) {
 
                 <div className="flex items-center gap-2 text-xs text-gray-500 mb-3">
                   <span className="bg-gray-100 px-2 py-1 rounded">
-                    {course.level}
+                    {getLevelText(course.level)}
                   </span>
                   <span>무제한</span>
                 </div>
@@ -146,19 +147,6 @@ export default function MyCoursesUI({ courses }: MyCoursesUIProps) {
                     <span>0%</span>
                   </div>
                   <Progress value={0} className="h-1" />
-                </div>
-
-                {/* 가격 */}
-                <div className="text-right">
-                  {course.discountPrice &&
-                  course.discountPrice < course.price ? (
-                    <div className="text-xs text-gray-400 line-through">
-                      ₩{formatPrice(course.price)}
-                    </div>
-                  ) : null}
-                  <div className="text-sm font-bold">
-                    ₩{formatPrice(course.discountPrice || course.price)}
-                  </div>
                 </div>
               </div>
 

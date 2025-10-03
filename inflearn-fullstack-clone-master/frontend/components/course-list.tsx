@@ -146,7 +146,7 @@ export default async function CourseList({
 
       {/* 페이지네이션 */}
       {data.pagination.totalPages > 1 && (
-        <div className="mt-12 flex justify-center">
+        <div className="mt-12 flex justify-center ">
           <Pagination>
             <PaginationContent>
               {data.pagination.hasPrev && (
