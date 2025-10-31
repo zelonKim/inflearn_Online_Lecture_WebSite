@@ -1,0 +1,15 @@
+# backend/docker-compose.yml
+services:
+  postgres:
+    image: postgres:16
+    container_name: inflearn_container
+    ports:
+      - '5433:5432'
+    environment:
+      POSTGRES_USER: prisma
+      POSTGRES_PASSWORD: prismapass
+      POSTGRES_DB: inflearn_db
+    volumes:
+      - inflearn_db_data:/var/lib/postgresql/data
+volumes:
+  inflearn_db_data:
