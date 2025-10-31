@@ -43,6 +43,7 @@ services:
       - NEXT_PUBLIC_PORTONE_STORE_ID=${NEXT_PUBLIC_PORTONE_STORE_ID}
       - NEXT_PUBLIC_PORTONE_CHANNEL_KEY=${NEXT_PUBLIC_PORTONE_CHANNEL_KEY}
       - DATABASE_URL=${DATABASE_URL:-postgresql://prisma:prismapass@db:5432/inflearn_db?schema=public}
+      - NEXTAUTH_URL=${NEXTAUTH_URL}
     depends_on:
       - backend
     restart: unless-stopped
