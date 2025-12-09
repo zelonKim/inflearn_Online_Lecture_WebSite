@@ -65,7 +65,9 @@ export default function SiteHeader({
   if (!isSiteHeaderNeeded) return null;
 
   if (cartItemsQuery.isLoading) {
-    return <Loader2 className="size-3 animate-spin" />;
+    return (
+      <Loader2 className="size-5 animate-spin text-center flex flex-row justify-center mt-1" />
+    );
   }
 
   return (

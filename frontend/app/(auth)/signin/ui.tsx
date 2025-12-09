@@ -3,20 +3,30 @@
 import Link from "next/link";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { Metadata } from "next";
+import { useRouter } from "next/navigation";
 
 export default function UI() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    signIn("credentials", {
+    const result = await signIn("credentials", {
       email,
       password,
-      redirectTo: "/",
+      redirect: false,
     });
+
+    if (result?.error) {
+      alert("계정 정보가 올바르지 않습니다");
+      return;
+    }
+
+    if (result?.ok) {
+      router.push("/");
+    }
   };
 
   return (
