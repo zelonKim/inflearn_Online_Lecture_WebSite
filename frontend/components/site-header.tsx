@@ -66,7 +66,11 @@ export default function SiteHeader({
 
   if (cartItemsQuery.isLoading) {
     return (
-      <Loader2 className="size-5 animate-spin text-center flex flex-row justify-center mt-1" />
+      <header className="sticky top-0 z-10 site-header w-full px-12 bg-white pt-2">
+        <div className="flex items-center justify-center min-h-[60px]">
+          <Loader2 className="size-5 animate-spin" />
+        </div>
+      </header>
     );
   }
 
