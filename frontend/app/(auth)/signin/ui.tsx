@@ -26,6 +26,7 @@ export default function UI() {
 
     if (result?.ok) {
       router.push("/");
+      router.refresh();
     }
   };
 
